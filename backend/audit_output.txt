@@ -1,0 +1,5 @@
+[dotenv@17.2.3] injecting env (9) from .env -- tip: ???? prevent committing .env to code: https://dotenvx.com/precommit
+Project ID: stream24-ott-3d01b
+Total records in watch_history: 1
+- zLMJPbZszuOHkeVeYbgKemsPRC53_TEST_MOVIE: Test Movie System (UID: zLMJPbZszuOHkeVeYbgKemsPRC53)
+Total records in continue_watching: 0

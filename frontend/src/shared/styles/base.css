@@ -1,0 +1,1207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+/* ---------------------------
+  THEME TOKENS (dark base only)
+--------------------------- */
+:root {
+  --bg: #000000;
+  --surface: #121212;
+  --elev-1: #ba0505;
+
+  --text: #e6e6e6;
+  --muted: #969696;
+
+  --skeleton-bg: #141414; /* base block */
+  --skeleton-mid: #272525; /* mid tone */
+  --skeleton-hi: #2b2b2b; /* shimmer highlight */
+
+  --accent: #e50914;
+  --accent-contrast: #ffffff;
+
+  --success: #2ecc71;
+  --danger: #ff5c5c;
+
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.06);
+
+  /* overlay used by small controls (wishlist button, tooltips) and arrows */
+  --card-overlay: rgba(0, 0, 0, 0.6);
+
+  --focus-ring: 0 0 0 4px rgba(229, 9, 20, 0.12);
+  --hover-overlay: rgba(255, 255, 255, 0.04);
+
+  --shadow-1: 0 6px 18px rgba(2, 2, 2, 0.6);
+  --shadow-2: 0 10px 30px rgba(2, 2, 2, 0.7);
+
+  --divider: rgba(255, 255, 255, 0.04);
+  --disabled: rgba(255, 255, 255, 0.08);
+
+  --fast: 120ms;
+  --medium: 220ms;
+  --slow: 360ms;
+  --curve: cubic-bezier(0.2, 0.9, 0.3, 1);
+
+  --sb-thumb: rgba(255, 255, 255, 0.12);
+  --sb-track: rgba(0, 0, 0, 0);
+  --sb-thumb-hover: rgba(255, 255, 255, 0.18);
+
+  color-scheme: dark;
+
+  /* Sidebar layout tokens */
+  --sidebar-expanded: 248px;
+  --sidebar-collapsed: 72px;
+  --sidebar-current: var(--sidebar-collapsed);
+}
+
+/* ---------------------------
+     SCROLLBAR & SMOOTHING (INDUSTRIAL)
+--------------------------- */
+html {
+  margin: 0;
+  padding: 0;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  min-height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  scrollbar-gutter: stable;
+  min-height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* On mobile there are no persistent scrollbars — scrollbar-gutter
+   just wastes space or causes hairline rendering artifacts */
+@media (max-width: 639px) {
+  html, body {
+    scrollbar-gutter: auto;
+  }
+}
+
+/* Prevent any section/header default margin from creating a gap */
+section, header, nav {
+  margin: 0;
+  padding: 0;
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+html::-webkit-scrollbar-track {
+  background: var(--sb-track);
+}
+html::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+}
+
+/* ---------------------------
+   CAROUSEL HELPERS
+--------------------------- */
+/* ---------------------------
+   CAROUSEL HELPERS
+--------------------------- */
+.scroll-prominent::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+}
+.scroll-prominent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 10px;
+}
+.scroll-prominent::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.6) !important;
+  border-radius: 10px;
+  border: 2px solid #0f0f0f;
+  background-clip: padding-box;
+}
+.scroll-prominent::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.9) !important;
+}
+/* Firefox */
+.scroll-prominent {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(59, 130, 246, 0.6) rgba(255, 255, 255, 0.05) !important;
+}
+.scroll-premium::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-premium::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.scroll-premium::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.scroll-premium::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.carousel-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  box-sizing: border-box;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.carousel-row {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Navigation buttons */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.carousel-shell:hover .carousel-nav {
+  opacity: 1;
+}
+
+.carousel-nav:hover {
+  transform: translateY(-50%) scale(1.08);
+  background: rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* =========================
+   CARD PREMIUM MOTION
+========================= */
+
+.carousel-card-wrapper {
+  position: relative;
+  z-index: 10;
+  scroll-snap-align: start;
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Only apply hover lift effect on devices that support hover (desktop) */
+@media (hover: hover) {
+  .carousel-card-wrapper:hover {
+    transform: translateY(-8px);
+    z-index: 40;
+  }
+
+  .carousel-row:hover .carousel-card-wrapper:not(:hover) {
+    filter: brightness(0.6) saturate(0.7);
+    transform: translateY(2px);
+  }
+}
+
+/* =========================
+   CINEMATIC FEEL ENHANCEMENT
+========================= */
+
+.carousel-shell {
+  perspective: 1200px;
+}
+
+.carousel-row {
+  transform-style: preserve-3d;
+}
+
+.carousel-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 2%,
+    black 98%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 2%,
+    black 98%,
+    transparent 100%
+  );
+}
+
+.carousel-mask {
+  border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media (max-width: 768px) {
+  /* Brighten cards slightly on mobile */
+  .carousel-card-wrapper {
+    filter: brightness(1.08);
+  }
+
+  /* Reduce heavy shadow on mobile */
+  .carousel-card-wrapper > div {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  /* Make title overlay lighter */
+  .carousel-card-wrapper .bg-gradient-to-t {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75),
+      rgba(0, 0, 0, 0.35),
+      transparent
+    );
+  }
+}
+
+/* Ensure wishlist always visible on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .wishlist-btn {
+    opacity: 1 !important;
+  }
+}
+
+/* ===========================
+   WISHLIST MICRO-INTERACTION
+=========================== */
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-heartPop {
+  animation: heartPop 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* ===========================
+   MOBILE VISUAL TUNING
+=========================== */
+
+@media (max-width: 768px) {
+  .carousel-card-wrapper {
+    filter: brightness(1.08) saturate(1.05);
+  }
+
+  .carousel-card-wrapper img {
+    filter: brightness(1.08) contrast(1.05);
+  }
+}
+
+/* ---------------------------
+      GLOBAL ROOT STYLES
+--------------------------- */
+html,
+body,
+#root {
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+  max-width: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------------------------
+      COMPONENT UTILITIES
+--------------------------- */
+@layer utilities {
+  /* Button tweaks for hero actions */
+  .btn-watch {
+    background: #ffffff;
+    color: #0f1720; /* dark text for contrast */
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 10px rgba(2, 6, 23, 0.08);
+    transition:
+      transform var(--fast),
+      box-shadow var(--fast),
+      opacity var(--fast);
+  }
+  .btn-watch:hover,
+  .btn-watch:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(2, 6, 23, 0.12);
+    opacity: 0.98;
+  }
+
+  /* Wishlist button — make border visible and accessible */
+  .btn-wishlist {
+    background: transparent;
+    color: var(--text);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition:
+      background var(--fast),
+      border-color var(--fast),
+      color var(--fast),
+      transform var(--fast),
+      box-shadow var(--fast);
+  }
+
+  /* Hover / focus states for wishlist when not in wishlist */
+  .btn-wishlist:hover,
+  .btn-wishlist:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.32);
+    transform: translateY(-1px);
+  }
+
+  /* When item is in wishlist, use accent background */
+  .btn-wishlist--active {
+    background: #b20710; /* subtle solid dark-red (theme-friendly, not bright) */
+    color: #ffffff;
+    border: 1px solid #d40f1a; /* slightly brighter border for structure */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  }
+
+  .btn-wishlist--active:hover,
+  .btn-wishlist--active:focus {
+    background: #c20d15;
+    border-color: #e0111c;
+    transform: translateY(-1px);
+  }
+
+  /* =========================================================
+   SIDEBAR — CLEAN, FIXED, PROFESSIONAL
+========================================================= */
+
+  /* Sidebar container */
+  .sidebar--BG {
+    @apply h-[100%] flex flex-col;
+    background: linear-gradient(180deg, #0b0b0b 0%, #080808 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    z-index: 50;
+
+    will-change: width;
+    transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sidebar-item {
+    width: 100%;
+    box-sizing: border-box;
+
+    position: relative; /* Required for highlight layer */
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    height: 44px;
+    padding: 0 14px;
+    gap: 12px;
+
+    border-radius: 14px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  /* Collapsed mode */
+  .sidebar-item.collapsed {
+    justify-content: center;
+    padding: 0;
+    gap: 0;
+  }
+
+  /* Highlight layer (used for hover + active) */
+  .sidebar-item::before {
+    content: "";
+    position: absolute;
+    inset: 0px 8px; /* This creates the spacing from sidebar walls */
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+    opacity: 0;
+    transition: opacity 160ms ease;
+    z-index: 0;
+  }
+
+  /* Hover shows highlight */
+  .sidebar-item:hover::before {
+    opacity: 1;
+  }
+
+  /* Active shows same highlight */
+  .sidebar-item.active::before {
+    opacity: 1;
+  }
+
+  /* Bring content above highlight */
+  .sidebar-item > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hover text + icon */
+  .sidebar-item:hover .sidebar--icon,
+  .sidebar-item:hover .sidebar--Font {
+    color: var(--text);
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  /* ICON SYSTEM */
+  .sidebar--icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    line-height: 1;
+
+    color: inherit;
+    opacity: inherit;
+
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease,
+      color 160ms ease;
+  }
+
+  .sidebar--icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Hover scale */
+  .sidebar-item:hover .sidebar--icon {
+    transform: scale(1.05);
+  }
+
+  /* Active scale (same as hover) */
+  .sidebar-item.active .sidebar--icon {
+    transform: scale(1.05);
+  }
+
+  /* TEXT */
+  .sidebar--Font {
+    font-size: 14.5px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease;
+  }
+
+  /* PROFILE / AVATAR */
+  .sidebar-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9999px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+
+  /* Tooltip polish */
+  .group > span.absolute {
+    background: rgba(18, 18, 18, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 6px 10px;
+    letter-spacing: 0.2px;
+  }
+
+  /* Collapsed spacing */
+  @media (min-width: 641px) {
+    .group {
+      min-height: 44px;
+    }
+  }
+
+  /* Content */
+  .content {
+    @apply w-[100%] h-auto mt-2 mb-2 flex-row items-center lg:ml-0;
+    color: var(--muted);
+  }
+
+  .content-box {
+    @apply rounded-md mr-2 flex justify-between p-2;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+  }
+
+  .content-poster {
+    @apply rounded-md opacity-100;
+  }
+
+  .sec-content {
+    @apply flex-grow overflow-y-auto;
+  }
+
+  /* Scroll-hide utility */
+  .scroll-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-hide::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  /* Carousel fade overlays */
+  .carousel-edge-left,
+  .carousel-edge-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50px; /* increased default width to cover big posters/rounding */
+    pointer-events: none;
+    z-index: 9999; /* higher z-index to ensure overlay sits above posters */
+    will-change: transform;
+  }
+
+  /* Add a tiny solid anchor at the very edge (0%–8%), then fade to transparent.
+     This prevents a semitransparent band touching the poster because of rounding/antialiasing. */
+  .carousel-edge-left {
+    left: 0;
+    background: linear-gradient(
+      90deg,
+      var(--bg) 0%,
+      var(--bg) 8%,
+      rgba(0, 0, 0, 0) 70%
+    );
+  }
+  .carousel-edge-right {
+    right: 0;
+    background: linear-gradient(
+      270deg,
+      var(--bg) 0%,
+      var(--bg) 8%,
+      rgba(0, 0, 0, 0) 70%
+    );
+  }
+
+  /* Carousel arrows */
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10000;
+    background: var(--card-overlay); /* theme-aware */
+    border: none;
+    color: var(--text);
+    padding: 8px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all var(--medium) var(--curve);
+  }
+  .carousel-arrow.left {
+    left: 12px;
+  } /* move inward so it doesn't overlap the overlay anchor */
+  .carousel-arrow.right {
+    right: 12px;
+  }
+
+  .carousel-arrow[aria-disabled="true"] {
+    opacity: 0.28;
+    pointer-events: none;
+    filter: grayscale(0.25);
+  }
+  .carousel-arrow[aria-disabled="false"] {
+    opacity: 0.95;
+    pointer-events: auto;
+  }
+
+  /* When showing on small screens, reduce width and padding but add padding on the scroll container
+     so cards are inset from the viewport edge and can't peek through. */
+  @media (max-width: 640px) {
+    .carousel-arrow {
+      padding: 6px;
+    }
+    .carousel-edge-left,
+    .carousel-edge-right {
+      width: 64px;
+    }
+
+    /* Nudge overlays slightly outward on phones to avoid a tiny poster-peek gap.
+       Use a modest outward nudge together with container padding to be most robust. */
+    .carousel-edge-left {
+      left: -12px;
+    }
+    .carousel-edge-right {
+      right: -12px;
+    }
+
+    /* Extend fade to handle rounded corners/antialiasing */
+    .carousel-edge-left {
+      background: linear-gradient(
+        90deg,
+        var(--bg) 0%,
+        var(--bg) 12%,
+        rgba(0, 0, 0, 0) 78%
+      );
+    }
+    .carousel-edge-right {
+      background: linear-gradient(
+        270deg,
+        var(--bg) 0%,
+        var(--bg) 12%,
+        rgba(0, 0, 0, 0) 78%
+      );
+    }
+
+    /* inset posters so they are not flush at the viewport edge */
+    .carousel-scroll {
+      padding-left: 18px; /* make first poster sit away from viewport edge */
+      padding-right: 18px; /* same for last poster */
+    }
+
+    /* also ensure snap alignment still works but leaves space */
+    .carousel-scroll > * {
+      scroll-margin-inline-start: 6px;
+      scroll-margin-inline-end: 6px;
+    }
+  }
+
+  .main-overlay {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+  }
+
+  .sidebar .watchlist-badge {
+    @apply ml-auto bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+
+  @media (min-width: 641px) {
+    .sidebar--Menu:hover .sidebar--icon {
+      transform: scale(1.1);
+    }
+  }
+
+  /* Logout animations & helper styles */
+  .logout-btn {
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  /* Hover lifts the button */
+  .logout-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  /* compact logout (collapsed) */
+  .logout-compact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    will-change: transform, background;
+  }
+
+  /* mobile compact slot */
+  .logout-compact-mobile {
+    will-change: transform;
+  }
+
+  /* tiny pop when logging out */
+  @keyframes logout-pop {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    40% {
+      transform: scale(1.08);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.98);
+      opacity: 1;
+    }
+  }
+
+  /* gentle spin used on icon click */
+  @keyframes logout-spin-key {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+    30% {
+      transform: rotate(20deg) scale(1.05);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
+  }
+
+  /* apply when animating */
+  .logout-animating .logout-icon,
+  .logout-animating .logout-icon-compact,
+  .logout-animating .logout-icon-mobile {
+    animation: logout-spin-key 420ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+
+  /* slight extra pop on the full button text */
+  .logout-animating.logout-btn {
+    animation: logout-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+
+  /* alternate smaller spin for compact icons when not expanded */
+  .logout-icon-compact,
+  .logout-icon-mobile,
+  .logout-icon {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  /* ensure pointer cursor */
+  .logout-btn,
+  .logout-compact,
+  .logout-compact-mobile {
+    cursor: pointer;
+  }
+
+  /* accessible focus ring */
+  .logout-btn:focus,
+  .logout-compact:focus,
+  .logout-compact-mobile:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease forwards;
+  }
+
+  /* ---------------------------
+         Skeleton loading
+  --------------------------- */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+      90deg,
+      var(--skeleton-bg) 0%,
+      var(--skeleton-mid) 50%,
+      var(--skeleton-bg) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: 8px;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.3s ease-in-out infinite;
+  }
+
+  /* Skeleton sizes */
+  .skeleton-line {
+    height: 16px;
+    border-radius: 6px;
+  }
+  .skeleton-line.short {
+    width: 140px;
+  }
+  .skeleton-line.medium {
+    width: 260px;
+  }
+  .skeleton-line.long {
+    width: 80%;
+  }
+
+  .skeleton-button {
+    height: 40px;
+    min-width: 120px;
+    border-radius: 8px;
+  }
+
+  .skeleton-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  /* Blur-up lazy load */
+  .blur-up {
+    filter: blur(12px);
+    transform: scale(1.02);
+    transition:
+      filter 450ms ease-out,
+      transform 450ms ease-out,
+      opacity 450ms ease-out;
+    opacity: 0.6;
+  }
+  .blur-up.loaded {
+    filter: blur(0);
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .skeleton-image {
+      height: 420px;
+    }
+  }
+
+  /* Mobile profile popover card */
+  .mobile-profile-popup-card {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-2);
+    backdrop-filter: blur(6px);
+    z-index: 1210;
+    transition:
+      transform 160ms var(--curve),
+      opacity 160ms var(--curve);
+    overflow: hidden;
+  }
+
+  /* simple border-t helper */
+  .mobile-profile-popup-card .border-t {
+    height: 1px;
+    width: 100%;
+  }
+
+  /* buttons */
+  .mobile-profile-popup-card button {
+    background: transparent;
+    color: var(--text);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .mobile-profile-popup-card button:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* MOBILE: ensure bottom nav allows visible overflow for badges/popover */
+  .mobile-profile-popup button {
+    background: transparent;
+    color: var(--text);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  /* slightly round the popup buttons and keep spacing */
+  .mobile-profile-popup button:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* make sure the wishlist badge sits nicely and is not clipped */
+  .fixed-bottom-nav-badge-fix {
+    overflow: visible !important;
+  }
+
+  /* (If you need an explicit helper on the container) */
+  @media (max-width: 640px) {
+    .mobile-profile-popup {
+      font-size: 14px;
+      padding: 6px 0;
+    }
+  }
+
+  /* =========================================================
+   DESKTOP SIDEBAR OVERRIDES (NO ANIMATIONS)
+  ========================================================= */
+
+  @media (min-width: 641px) {
+    /* Disable all sidebar icon animations */
+    .sidebar--icon-ninja,
+    .sidebar--icon-movie,
+    .sidebar--icon-tv,
+    .sidebar--icon-wishlist,
+    .sidebar--icon-settings,
+    .sidebar--icon-search,
+    .sidebar--icon-help,
+    .sidebar-avatar {
+      animation: none !important;
+    }
+
+    /* Hover behavior: scale + color only */
+    .group:hover .sidebar--icon {
+      transform: scale(1.1);
+      color: var(--text);
+      opacity: 1;
+    }
+
+    /* Expanded sidebar text turns white on hover */
+    .group:hover .sidebar--Font {
+      color: var(--text);
+      font-weight: 600;
+    }
+  }
+
+  /* profile page */
+  @keyframes toast-slide {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -16px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .animate-toast-slide {
+    animation: toast-slide 280ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  /* ===========================
+   HERO ANIMATIONS
+  =========================== */
+
+
+  @keyframes hero-kenburns {
+    from {
+      transform: scale(1.12) translateX(0px);
+    }
+    to {
+      transform: scale(1.04) translateX(-10px);
+    }
+  }
+
+  .hero-bg-animate {
+    animation: hero-kenburns 4s ease-out forwards;
+    will-change: opacity, transform;
+  }
+
+  /* ===========================
+   TEXT CINEMATIC REVEAL
+=========================== */
+
+  .hero-text > * {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: heroTextReveal 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .hero-text > *:nth-child(1) {
+    animation-delay: 120ms;
+  }
+  .hero-text > *:nth-child(2) {
+    animation-delay: 220ms;
+  }
+  .hero-text > *:nth-child(3) {
+    animation-delay: 340ms;
+  }
+  .hero-text > *:nth-child(4) {
+    animation-delay: 460ms;
+  }
+
+  @keyframes heroTextReveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ===========================
+   Frosted Glass Button – Ultra Premium
+=========================== */
+
+  .btn-glass {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Light sweep */
+  .btn-glass::after {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.12),
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: glassSweep 6s ease-in-out infinite;
+  }
+
+  /* Ambient glow breathing */
+  .btn-glass {
+    animation: glassPulse 8s ease-in-out infinite;
+  }
+
+  /* Animations */
+  @keyframes glassSweep {
+    0% {
+      transform: translateX(-120%);
+    }
+    60% {
+      transform: translateX(120%);
+    }
+    100% {
+      transform: translateX(120%);
+    }
+  }
+
+  @keyframes glassPulse {
+    0%,
+    100% {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    50% {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 14px 38px rgba(0, 0, 0, 0.75);
+    }
+  }
+
+  .hero-layer {
+    position: absolute;
+    inset: -2px; /* important: overdraws edges to prevent subpixel gaps */
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  .cinematic-dissolve {
+    animation: cinematicDissolve 900ms ease-out;
+    will-change: opacity, filter;
+  }
+
+  @keyframes cinematicDissolve {
+    0% {
+      opacity: 0;
+      filter: blur(10px) brightness(0.9);
+    }
+    60% {
+      opacity: 1;
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* =========================================================
+   MOBILE BOTTOM NAV — ICON VISIBILITY & SIZE FIX
+   (No height changes, mobile only)
+========================================================= */
+
+  @media (max-width: 640px) {
+    /* Make SVG icons bigger without changing navbar height */
+    .mobile-bottom-nav-icon svg {
+      width: 22px !important;
+      height: 22px !important;
+    }
+
+    /* Prevent icons from being clipped */
+    .mobile-bottom-nav-icon {
+      overflow: visible !important;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Reduce active highlight size so icons stay visible */
+    .mobile-bottom-nav-highlight {
+      width: 36px !important;
+      height: 36px !important;
+    }
+
+    /* Ensure wishlist badge is never hidden */
+    .fixed-bottom-nav-badge-fix {
+      overflow: visible !important;
+    }
+  }
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile API Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #2563EB;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        #output {
+            background: #000;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Profile API Test</h1>
+        
+        <div>
+            <h3>Test Profile Update</h3>
+            <input type="text" id="firstName" placeholder="First Name" value="John">
+            <input type="text" id="lastName" placeholder="Last Name" value="Doe">
+            <input type="text" id="username" placeholder="Username" value="johndoe123">
+            <br>
+            <input type="text" id="token" placeholder="Your Auth Token" style="width: 500px">
+            <br>
+            <button onclick="testUpdate()">Test Update Profile</button>
+            <button onclick="testGet()">Test Get Profile</button>
+            <button onclick="clearOutput()">Clear</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<span class="${type}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        async function testGet() {
+            const token = document.getElementById('token').value;
+            
+            if (!token) {
+                log('Please enter your auth token', 'error');
+                return;
+            }
+
+            log('Testing GET /api/v1/users/me...', 'info');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/v1/users/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                log(`Response Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log(`Response Data:\n${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdate() {
+            const token = document.getElementById('token').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const username = document.getElementById('username').value;
+
+            if (!token) {
+                log('Please enter your auth token', 'error');
+                return;
+            }
+
+            const payload = {
+                firstName,
+                lastName,
+                username
+            };
+
+            log('Testing PUT /api/v1/users/me...', 'info');
+            log(`Payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/v1/users/me', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                log(`Response Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log(`Response Data:\n${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+                if (response.ok && data.success) {
+                    log('✅ Profile update successful!', 'success');
+                } else {
+                    log('❌ Profile update failed', 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "predev": "netstat -ano | findstr :5050 >nul 2>&1 && (for /f \"tokens=5\" %a in ('netstat -ano ^| findstr :5050') do if not \"%a\"==\"0\" if not \"%a\"==\"-\" taskkill /F /PID %a /T >nul 2>&1) || echo Port 5050 clear",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.22.1",
+    "express-rate-limit": "^8.2.1",
+    "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.2",
+    "morgan": "^1.10.1",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.2",
+    "razorpay": "^2.9.6",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

@@ -1,0 +1,65 @@
+/* ── HeroSection styles ───────────────────────── */
+
+@keyframes bgZoom {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
+}
+
+@keyframes mouseWheel {
+  0%,100% { transform: translateY(0); opacity: 1; }
+  50%     { transform: translateY(6px); opacity: 0.35; }
+}
+
+/* ── Mobile-only overrides (≤639 px) ── */
+@media (max-width: 639px) {
+  .hero-img {
+    object-position: 60% 32% !important;
+  }
+
+  /* Full-width, centered layout on mobile */
+  .hero-content-inner {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-content-inner h1,
+  .hero-content-inner p {
+    text-align: center;
+  }
+
+  .hero-content-inner .cta-row {
+    justify-content: center;
+  }
+
+  /* Bring content down — sits comfortably above the scroll indicator */
+  .hero-content-mobile {
+    padding-bottom: 5.5rem !important;
+  }
+
+  /* Darken left side on mobile so centered text is readable */
+  .hero-side-grad {
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.35) 50%,
+      transparent 100%
+    ) !important;
+    width: 100% !important;
+  }
+
+  /* Show right-edge vignette on mobile only */
+  .hero-right-vignette {
+    display: block !important;
+  }
+
+  /* Scroll indicator position */
+  .hero-scroll {
+    bottom: 1rem !important;
+  }
+}
