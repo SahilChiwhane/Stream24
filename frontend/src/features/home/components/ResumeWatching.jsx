@@ -6,7 +6,6 @@ import Carousel from "../../browse/components/Carousel";
 export default function ResumeWatching() {
   const { history, loading, removeFromHistory, refresh } = useWatchHistory();
   const location = useLocation();
-  const isAnimePage = location.pathname.includes("/anime");
 
   // Industrial Refresh: Re-sync on mount to ensure latest progress is visible
   React.useEffect(() => {

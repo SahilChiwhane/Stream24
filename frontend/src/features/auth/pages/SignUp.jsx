@@ -493,7 +493,7 @@ export default function SignUp() {
   );
 
   const strongPasswordRegex =
-    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-\+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={\[\]};:'",.<>/?\\|`~]).{8,}$/;
 
   const validateAge18Plus = (day, month, year) => {
     if (!day || !month || !year) return false;

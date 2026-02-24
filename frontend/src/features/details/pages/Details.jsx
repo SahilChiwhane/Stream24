@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getContentDetails,
@@ -11,10 +11,7 @@ import {
   FaChevronDown,
   FaPlay,
   FaPlus,
-  FaCheck,
-  FaInfoCircle,
   FaHeart,
-  FaStar,
   FaClock,
 } from "react-icons/fa";
 import Loader from "../../../shared/components/Loader";
@@ -35,7 +32,6 @@ export default function Details() {
   const [details, setDetails] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState(null);
   const [allFallbacks, setAllFallbacks] = useState([]);
-  const [currentFallbackIndex, setCurrentFallbackIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [historyItem, setHistoryItem] = useState(null);
@@ -192,7 +188,7 @@ export default function Details() {
     return () => {
       mounted = false;
     };
-  }, [mediaType, id]);
+  }, [mediaType, id, details, loadSeason]);
 
   // Reset state on media change
   useEffect(() => {
@@ -303,17 +299,6 @@ export default function Details() {
           },
           onError: (event) => {
             console.warn("[PLAYER] API Error:", event.data);
-            setCurrentFallbackIndex((prev) => {
-              if (prev < allFallbacks.length) {
-                const url = allFallbacks[prev];
-                const nextId = url.includes("v=")
-                  ? url.split("v=")[1].split("&")[0]
-                  : url.split("/embed/")[1]?.split("?")[0];
-                if (nextId) setTrailerUrl(nextId);
-                return prev + 1;
-              }
-              return prev;
-            });
           },
         },
       };
@@ -360,7 +345,15 @@ export default function Details() {
       clearTimeout(timer);
       if (interval) clearInterval(interval);
     };
-  }, [trailerUrl, apiLoaded, loading, isVideoReady]);
+  }, [
+    trailerUrl,
+    apiLoaded,
+    loading,
+    isVideoReady,
+    allFallbacks,
+    historyItem,
+    progress,
+  ]);
 
   // Termination Cleanup
   useEffect(() => {
@@ -373,17 +366,20 @@ export default function Details() {
     };
   }, []);
 
-  const loadSeason = async (num) => {
-    try {
-      setLoadingSeason(true);
-      const data = await getSeasonDetails(id, num);
-      setSeasonData(data);
-    } catch (err) {
-      console.error("Failed to load season details:", err);
-    } finally {
-      setLoadingSeason(false);
-    }
-  };
+  const loadSeason = useCallback(
+    async (num) => {
+      try {
+        setLoadingSeason(true);
+        const data = await getSeasonDetails(id, num);
+        setSeasonData(data);
+      } catch (err) {
+        console.error("Failed to load season details:", err);
+      } finally {
+        setLoadingSeason(false);
+      }
+    },
+    [id],
+  );
 
   const handleSeasonChange = async (num) => {
     setSelectedSeason(num);
