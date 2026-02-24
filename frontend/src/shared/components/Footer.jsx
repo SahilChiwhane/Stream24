@@ -12,11 +12,11 @@ const COMPANY_LINKS = ["About", "Careers", "Press", "Terms", "Privacy"];
 const SUPPORT_LINKS = ["Help Center", "Contact Us", "Accessibility", "Refunds"];
 
 const SOCIAL_LINKS = [
-  { icon: <FaInstagram />, label: "Instagram", href: "#" },
-  { icon: <FaTwitter />, label: "Twitter", href: "#" },
-  { icon: <FaFacebookF />, label: "Facebook", href: "#" },
-  { icon: <FaLinkedinIn />, label: "LinkedIn", href: "#" },
-  { icon: <FaYoutube />, label: "YouTube", href: "#" },
+  { icon: <FaInstagram />, label: "Instagram", href: "/" },
+  { icon: <FaTwitter />, label: "Twitter", href: "/" },
+  { icon: <FaFacebookF />, label: "Facebook", href: "/" },
+  { icon: <FaLinkedinIn />, label: "LinkedIn", href: "/" },
+  { icon: <FaYoutube />, label: "YouTube", href: "/" },
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -30,7 +30,7 @@ const FooterSection = ({ title, items }) => (
       {items.map((label) => (
         <li key={label}>
           <a
-            href="#"
+            href="/"
             className="text-gray-500 hover:text-white text-[15px] font-medium transition-all duration-300 hover:translate-x-1 inline-block"
           >
             {label}
@@ -99,19 +99,19 @@ const Footer = () => {
 
           <div className="flex gap-8">
             <a
-              href="#"
+              href="/"
               className="text-[12px] text-gray-600 font-bold uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
               Safety
             </a>
             <a
-              href="#"
+              href="/"
               className="text-[12px] text-gray-600 font-bold uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
               Cookies
             </a>
             <a
-              href="#"
+              href="/"
               className="text-[12px] text-gray-600 font-bold uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
               Press

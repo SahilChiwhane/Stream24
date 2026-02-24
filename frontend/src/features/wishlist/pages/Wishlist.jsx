@@ -1,7 +1,6 @@
 import React from "react";
 import { useWishlist } from "../context/WishlistContext";
 import { Trash2, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
 import EmptyState from "../../../shared/components/EmptyState";
 
 const Wishlist = () => {

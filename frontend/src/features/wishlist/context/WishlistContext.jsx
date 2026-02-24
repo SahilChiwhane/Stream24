@@ -3,7 +3,6 @@ import {
   fetchWishlist,
   addWishlist,
   removeWishlist,
-  checkWishlist,
 } from "../services/wishlist.service";
 
 import { useAuth } from "../../auth/context/AuthContext";
