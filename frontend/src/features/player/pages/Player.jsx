@@ -34,7 +34,6 @@ export default function Player() {
   const [showFallbackButton, setShowFallbackButton] = useState(false);
   const [isYtReady, setIsYtReady] = useState(!!(window.YT && window.YT.Player));
   const [initialStartTime, setInitialStartTime] = useState(0);
-  const [uiProgress, setUiProgress] = useState(0);
 
   const progressRef = useRef(0);
   const durationRef = useRef(0);
@@ -177,7 +176,6 @@ export default function Player() {
       }
 
       progressRef.current = currentTime;
-      setUiProgress(currentTime);
 
       const floor = Math.floor(currentTime);
       if (floor > 0 && floor % 5 === 0 && floor !== lastSavedRef.current) {
@@ -261,7 +259,7 @@ export default function Player() {
         },
       },
     });
-  }, [allUrls, currentUrlIndex, isYtReady]);
+  }, [allUrls, currentUrlIndex, isYtReady, startPolling]);
 
   /* ───────────────── INITIALIZE PLAYER ───────────────── */
 

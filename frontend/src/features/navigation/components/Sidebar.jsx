@@ -285,11 +285,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useWishlist } from "../../wishlist/context/WishlistContext";
 import { useAuth } from "../../auth/context/AuthContext";
 import { NAV_ITEMS, LOCAL_USER_KEY } from "./sidebar.constants";
-import {
-  getInitials,
-  initialsBgColor,
-  findScrollContainer,
-} from "./sidebar.utils";
+import { getInitials, initialsBgColor } from "./sidebar.utils";
 import useSidebarLayout from "../hooks/useSidebarLayout";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 
@@ -372,8 +368,6 @@ const Sidebar = () => {
     if (!isMobile) return;
 
     // 1. Scroll Logic
-    const scrollContainer = window; // Simplify to window for mobile global scroller
-
     const getPos = () =>
       window.pageYOffset || document.documentElement.scrollTop || 0;
 

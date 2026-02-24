@@ -3,8 +3,6 @@ import StreamingExp from "../../../assets/streamExp3.png";
 
 const StreamingBenefitsSection = () => {
   const ref = useRef(null);
-  const [scrollY, setScrollY] = useState(0);
-  const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

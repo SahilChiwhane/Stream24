@@ -83,7 +83,7 @@ export default function MobileProfilePopover({
       document.removeEventListener("click", onDoc);
       document.removeEventListener("touchstart", onDoc);
     };
-  }, [onClose]);
+  }, [onClose, anchorRef]);
 
   useLayoutEffect(() => {
     const el = popRef.current;

@@ -4,7 +4,6 @@ import Noise from "../../../assets/noise.png";
 
 const DeviceHeroSection = () => {
   const sectionRef = useRef(null);
-  const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
