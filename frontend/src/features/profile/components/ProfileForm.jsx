@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaUser, FaUserTag, FaEnvelope, FaCheckCircle } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaCheckCircle } from "react-icons/fa";
 
 export default function ProfileForm({
   savedName,

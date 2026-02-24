@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "../../auth/context/AuthContext";
 import api from "../../../services/api";
-import { getAvatarById } from "../config/avatars";
 
 export const useProfileForm = () => {
   const { user, refreshUser } = useAuth();
@@ -84,15 +83,7 @@ export const useProfileForm = () => {
     return () => {
       mounted = false;
     };
-  }, [user?.uid]);
-
-  // Validation Logic (Matches Backend Joi)
-  const validate = () => {
-    const newErrors = {};
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  }, [user, user?.uid]);
 
   // Persist Changes
   const save = useCallback(

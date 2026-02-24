@@ -43,7 +43,7 @@ export function WatchHistoryProvider({ children }) {
     loadHistory();
   }, [loadHistory]);
 
-  const removeFromHistory = async (historyId) => {
+  const removeFromHistory = useCallback(async (historyId) => {
     try {
       await removeFromWatchHistory(historyId);
       setHistory((prev) => prev.filter((item) => item.id !== historyId));
@@ -51,7 +51,7 @@ export function WatchHistoryProvider({ children }) {
       console.error("[HISTORY_CONTEXT] Remove failed:", err);
       throw err;
     }
-  };
+  }, []);
 
   const refresh = useCallback(() => loadHistory(), [loadHistory]);
 

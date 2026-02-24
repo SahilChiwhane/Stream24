@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../../../services/api";
 import MovieCard from "../../browse/components/Card";
 import { Search as SearchIcon, X } from "lucide-react";
@@ -14,7 +14,6 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Sync query with ?q=
   useEffect(() => {
