@@ -10,13 +10,13 @@ import { getFirestore } from "firebase/firestore";
  * Firebase configuration
  */
 const firebaseConfig = {
-  apiKey: "AIzaSyCCzrUf1P-bncdvZTpM2VhSx4W1PSV0kZY",
-  authDomain: "stream24-ott-3d01b.firebaseapp.com",
-  projectId: "stream24-ott-3d01b",
-  storageBucket: "stream24-ott-3d01b.firebasestorage.app",
-  messagingSenderId: "439789118236",
-  appId: "1:439789118236:web:f60296651e901bcc2810d9",
-  measurementId: "G-WBM56XE365",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 /**
