@@ -1,3 +1,4 @@
+// Production Build: 2026-02-26
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -42,12 +43,16 @@ app.use(compression()); // ⚡ Compress all responses
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps or curl)
+      // Allow requests with no origin (like mobile apps/curl)
       if (!origin) return callback(null, true);
-      if (
-        env.ALLOWED_ORIGINS.indexOf(origin) !== -1 ||
-        env.NODE_ENV === "development"
-      ) {
+
+      const isAllowed =
+        env.ALLOWED_ORIGINS.includes(origin) ||
+        env.ALLOWED_ORIGINS.includes("*") ||
+        origin.endsWith(".vercel.app") || // 🚀 Auto-allow Vercel previews
+        env.NODE_ENV === "development";
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));

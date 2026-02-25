@@ -13,3 +13,4 @@ build/
 .agent/
 .gemini/
 .firebase/
+PRODUCTION_GUIDE.md
