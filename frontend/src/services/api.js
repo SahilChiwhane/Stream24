@@ -18,29 +18,17 @@ const getAuthenticatedUser = () => {
     // 1. Immediate check
     if (auth.currentUser) return resolve(auth.currentUser);
 
-    // 2. Poll for a short duration (handles the gap between event and singleton update)
-    let attempts = 0;
-    const maxAttempts = 20; // 2 seconds (20 * 100ms)
-
-    const interval = setInterval(() => {
-      attempts++;
-      if (auth.currentUser) {
-        clearInterval(interval);
-        resolve(auth.currentUser);
-      } else if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        resolve(null);
-      }
-    }, 100);
-
-    // 3. Fallback: Also listen for one state change just in case
+    // 2. Wait for auth to initialize (max 3 seconds)
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        clearInterval(interval);
-        unsubscribe();
-        resolve(user);
-      }
+      unsubscribe();
+      resolve(user);
     });
+
+    // Timeout fallback
+    setTimeout(() => {
+      unsubscribe();
+      resolve(null);
+    }, 3000);
   });
 };
 
@@ -48,29 +36,14 @@ api.interceptors.request.use(async (config) => {
   try {
     let user = auth.currentUser;
 
-    // If no user immediately available, wait briefly (handles bootstrap race)
+    // If no user immediately available, wait for bootstrap
     if (!user) {
-      // console.debug(`[API] Waiting for auth for: ${config.url}`);
       user = await getAuthenticatedUser();
-      // if (user) console.debug(`[API] Auth found for: ${config.url}`);
     }
 
     if (user) {
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true); // 🚀 Force refresh if needed
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      // Only warn if it's not a common public route
-      const publicRoutes = [
-        "/auth/login",
-        "/auth/signup",
-        "/auth/session",
-        "/assets",
-      ];
-      const isPublic = publicRoutes.some((route) => config.url.includes(route));
-
-      if (!isPublic) {
-        // Silenced polling timeout warning
-      }
     }
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
