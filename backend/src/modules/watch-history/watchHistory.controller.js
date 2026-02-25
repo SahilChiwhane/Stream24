@@ -9,7 +9,7 @@ import logger from "../../utils/logger.js";
 /**
  * GET /watch-history
  */
-export const getWatchHistory = async (req, res) => {
+export const getWatchHistory = async (req, res, next) => {
   try {
     const { uid } = req.user;
     res.setHeader(
@@ -21,10 +21,7 @@ export const getWatchHistory = async (req, res) => {
 
     return success(res, { list }, "Watch history loaded");
   } catch (err) {
-    logger.error(
-      `Failed to fetch watch history for ${req.user?.uid}: ${err.message}`,
-    );
-    return failure(res, err.message || "Failed to load watch history", 500);
+    next(err);
   }
 };
 
@@ -32,31 +29,22 @@ export const getWatchHistory = async (req, res) => {
  * POST /watch-history
  * Body: { contentId, contentType, title, thumbnail, season, episode, durationSeconds, progress }
  */
-export const upsertHistory = async (req, res) => {
+export const upsertHistory = async (req, res, next) => {
   try {
     const { uid } = req.user;
-    const { contentId, progress, durationSeconds } = req.body;
-
-    console.log(
-      `\n\x1b[42m[HISTORY_CONTROLLER] UPDATE RECEIVED\x1b[0m Content: ${contentId} | Progress: ${progress}s | Duration: ${durationSeconds}s`,
-    );
-
     const payload = { ...req.body, uid };
     await upsertWatchHistory(payload);
 
     return success(res, null, "Watch history updated");
   } catch (err) {
-    console.log(
-      `\x1b[41m[HISTORY_CONTROLLER] FAILED\x1b[0m Error: ${err.message}`,
-    );
-    return failure(res, err.message || "Failed to update watch history", 500);
+    next(err);
   }
 };
 
 /**
  * DELETE /watch-history/:id
  */
-export const removeFromHistory = async (req, res) => {
+export const removeFromHistory = async (req, res, next) => {
   try {
     const { uid } = req.user;
     const { id } = req.params;
@@ -71,6 +59,6 @@ export const removeFromHistory = async (req, res) => {
       return failure(res, "Item not found or unauthorized", 404);
     }
   } catch (err) {
-    return failure(res, err.message || "Failed to remove item", 500);
+    next(err);
   }
 };

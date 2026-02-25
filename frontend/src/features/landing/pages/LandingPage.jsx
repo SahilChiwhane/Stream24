@@ -15,6 +15,7 @@ const LandingPage = () => {
     <div className="bg-black text-white w-full overflow-hidden">
       <HomeNav />
       <HeroSection />
+
       <DeviceSupportSection />
       <StreamingBenefitsSection />
       <SubscriptionPlansSection />

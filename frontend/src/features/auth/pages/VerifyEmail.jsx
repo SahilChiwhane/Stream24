@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { sendEmailVerification } from "firebase/auth";
-import BGImg from "../../../assets/BGImgg.png";
+import BGImg from "../../../assets/authBg.png";
 import { auth } from "../../../services/firebase";
 
 export default function VerifyEmail() {

@@ -138,7 +138,7 @@ const Search = () => {
             <SearchIcon className="w-5 h-5 text-gray-400 mr-3 shrink-0" />
             <input
               className="w-full bg-transparent outline-none text-white placeholder:text-gray-500 text-lg"
-              placeholder="Search movies, TV shows, actors..."
+              placeholder="Search movies, TV shows, anime..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
@@ -204,7 +204,7 @@ const Search = () => {
                   "";
                 return (
                   <button
-                    key={`${item.mediaType}-sugg-${item.id}`}
+                    key={`${item.mediaType}-sugg-${item.id}${item.season ? `-s${item.season}` : ""}`}
                     type="button"
                     onClick={() => handleSuggestionClick(item)}
                     className="text-xs sm:text-sm px-3 py-1 rounded-full bg-[#1a1a1a] border border-[#333] hover:border-gray-400 transition"

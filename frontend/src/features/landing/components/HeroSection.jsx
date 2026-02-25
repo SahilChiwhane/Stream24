@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BGImg from "../../../assets/hero_img.png";
+import BGImg from "../../../assets/heroBg.png";
 import "./HeroSection.css";
 
 /* ─── Helpers ────────────────────────────────── */

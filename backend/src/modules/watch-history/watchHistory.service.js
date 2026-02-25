@@ -56,8 +56,8 @@ export const upsertWatchHistory = async (payload) => {
         const doc = await ref.get();
         if (doc.exists) {
           await ref.delete();
-          console.log(
-            `\x1b[43m[HISTORY_SERVICE] CLEANUP\x1b[0m Deleted completed session ${docId} for user ${uid}`,
+          logger.info(
+            `[CLEANUP] Deleted completed session ${docId} for user ${uid}`,
           );
         }
         return; // Stop here if completed
@@ -91,13 +91,9 @@ export const upsertWatchHistory = async (payload) => {
     }
 
     await ref.set(data, { merge: true });
-    console.log(
-      `\x1b[42m[HISTORY_SERVICE] SUCCESS\x1b[0m Wrote ${docId} for user ${uid}`,
-    );
+    logger.debug(`[SUCCESS] Wrote ${docId} for user ${uid}`);
   } catch (err) {
-    console.error(
-      `\x1b[41m[HISTORY_SERVICE] CRITICAL ERROR\x1b[0m ${err.message}`,
-    );
+    logger.error(`[HISTORY_SERVICE] CRITICAL ERROR: ${err.message}`);
     throw err;
   }
 };

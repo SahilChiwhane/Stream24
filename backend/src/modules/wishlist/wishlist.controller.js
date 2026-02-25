@@ -5,19 +5,19 @@ import {
   removeWishlistItem,
   isInWishlist,
 } from "./wishlist.service.js";
+import logger from "../../utils/logger.js";
 
-export const getMyWishlist = async (req, res) => {
+export const getMyWishlist = async (req, res, next) => {
   try {
     const userId = req.user.uid;
     const data = await getWishlist(userId);
     return success(res, data);
   } catch (err) {
-    console.error("getMyWishlist:", err);
-    return failure(res, "Failed to load wishlist");
+    next(err);
   }
 };
 
-export const addToWishlist = async (req, res) => {
+export const addToWishlist = async (req, res, next) => {
   try {
     const userId = req.user.uid;
     const item = req.body;
@@ -25,12 +25,11 @@ export const addToWishlist = async (req, res) => {
     await addWishlistItem(userId, item);
     return success(res, null, "Added to wishlist");
   } catch (err) {
-    console.error("addToWishlist:", err);
-    return failure(res, "Failed to add to wishlist");
+    next(err);
   }
 };
 
-export const removeFromWishlist = async (req, res) => {
+export const removeFromWishlist = async (req, res, next) => {
   try {
     const userId = req.user.uid;
     const { id } = req.params;
@@ -38,12 +37,11 @@ export const removeFromWishlist = async (req, res) => {
     await removeWishlistItem(userId, id);
     return success(res, null, "Removed from wishlist");
   } catch (err) {
-    console.error("removeFromWishlist:", err);
-    return failure(res, "Failed to remove from wishlist");
+    next(err);
   }
 };
 
-export const checkWishlist = async (req, res) => {
+export const checkWishlist = async (req, res, next) => {
   try {
     const userId = req.user.uid;
     const { id } = req.params;
@@ -51,7 +49,6 @@ export const checkWishlist = async (req, res) => {
     const exists = await isInWishlist(userId, id);
     return success(res, { exists });
   } catch (err) {
-    console.error("checkWishlist:", err);
-    return failure(res, "Failed to check wishlist");
+    next(err);
   }
 };

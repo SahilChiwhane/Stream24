@@ -25,14 +25,18 @@ export const env = {
         "http://127.0.0.1:3000",
         "http://192.168.1.109:3000",
         "http://192.168.1.105:3000",
+        "http://192.168.1.109:5051",
+        "http://192.168.1.105:5051",
       ],
 };
+
+import logger from "../utils/logger.js";
 
 function customRequireEnv(key) {
   const value = process.env[key];
   if (!value) {
     // Warn instead of throw for now to avoid breaking if .env is missing locally
-    console.warn(`WARN: Missing env variable: ${key}`);
+    logger.warn(`Missing env variable: ${key}`);
     return "";
   }
   return value;

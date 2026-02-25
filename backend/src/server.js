@@ -6,9 +6,7 @@ import app from "./app.js";
 import logger from "./utils/logger.js";
 
 const server = app.listen(env.PORT, "0.0.0.0", () => {
-  logger.info(`Stream24 API is live on port ${env.PORT}`);
-  logger.auth(`Connect on Network: http://192.168.1.109:${env.PORT}`);
-  logger.debug(`Environment: ${env.NODE_ENV}`);
+  logger.info(`Stream24 API live on :${env.PORT} [${env.NODE_ENV}]`);
 });
 
 // --- INDUSTRIAL GRACEFUL SHUTDOWN ---
@@ -21,7 +19,7 @@ const shutdown = (signal) => {
 
   // If server takes too long to close, force exit
   setTimeout(() => {
-    console.error(
+    logger.error(
       "Could not close connections in time, forcefully shutting down",
     );
     process.exit(1);
@@ -33,5 +31,5 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 // Handle unhandled rejections
 process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Rejection:", err);
+  logger.error("Unhandled Rejection:", err);
 });

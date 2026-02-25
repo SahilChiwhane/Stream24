@@ -49,3 +49,49 @@ root.render(
     </BrowserRouter>
   </React.StrictMode>,
 );
+
+// Register Service Worker to satisfy Manifest/PWA requirements
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then((reg) => {}) // Silenced for production-like feel
+      .catch((err) => {}); // Silenced
+  });
+}
+
+/**
+ * 🛠️ DEVELOPMENT HACK: Filter Razorpay "Noise"
+ * Razorpay SDK scans local ports for anti-fraud, causing ERR_CONNECTION_REFUSED.
+ * This silences those specific errors in the console to keep it clean.
+ */
+if (process.env.NODE_ENV !== "development") {
+  const originalLog = console.log;
+  console.log = (...args) => {
+    const msg = args[0]?.toString() || "";
+    // Filter out React DevTools reminder noise
+    if (msg.includes("Download the React DevTools")) return;
+    originalLog.apply(console, args);
+  };
+}
+
+if (process.env.NODE_ENV === "development") {
+  const originalError = console.error;
+  const originalWarn = console.warn;
+
+  console.error = (...args) => {
+    const msg = args[0]?.toString() || "";
+    // Filter out Razorpay localhost scanning errors
+    if (msg.includes("localhost:7070") || msg.includes("localhost:37857"))
+      return;
+    originalError.apply(console, args);
+  };
+
+  console.warn = (...args) => {
+    const msg = args[0]?.toString() || "";
+    // Filter out Razorpay permissions/fingerprint warnings
+    if (msg.includes("x-rtb-fingerprint-id") || msg.includes("accelerometer"))
+      return;
+    originalWarn.apply(console, args);
+  };
+}

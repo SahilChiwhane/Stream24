@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { auth } from "../../../services/firebase";
+import { useAuth } from "../../auth/context/AuthContext";
 import api from "../../../services/api";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, loading, initialized } = useAuth();
   const plan = location?.state?.plan || null;
-  const user = auth.currentUser;
 
-  const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [razorpayReady, setRazorpayReady] = useState(false);
 
   const parseAmount = (val) => {
@@ -26,8 +26,20 @@ export default function PaymentPage() {
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => setRazorpayReady(true);
     document.body.appendChild(script);
-    return () => document.body.removeChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, []);
+
+  if (loading || !initialized) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   if (!plan || !user) {
     return (
@@ -38,7 +50,7 @@ export default function PaymentPage() {
   }
 
   const handleTestPayment = async () => {
-    if (!razorpayReady || loading) return;
+    if (!razorpayReady || isProcessing) return;
 
     if (!plan?.id || amountPaise <= 0) {
       alert("Invalid plan data. Please restart checkout.");
@@ -46,7 +58,7 @@ export default function PaymentPage() {
       return;
     }
 
-    setLoading(true);
+    setIsProcessing(true);
 
     try {
       const orderRes = await api.post("/payments/create-order", {
@@ -70,7 +82,7 @@ export default function PaymentPage() {
         },
         prefill: {
           email: user.email,
-          name: user.displayName || "User",
+          name: user.name || "User",
         },
         handler: async (res) => {
           await api.post("/payments/confirm", {
@@ -98,7 +110,7 @@ export default function PaymentPage() {
         err?.response?.data?.message || "Payment initialization failed";
       alert(msg);
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -110,10 +122,10 @@ export default function PaymentPage() {
 
         <button
           onClick={handleTestPayment}
-          disabled={loading}
+          disabled={isProcessing}
           className="w-full py-3 rounded-xl font-semibold bg-blue-600 hover:bg-blue-500 transition disabled:opacity-50"
         >
-          {loading ? "Processing..." : "Pay with Razorpay (Test Mode)"}
+          {isProcessing ? "Processing..." : "Pay with Razorpay (Test Mode)"}
         </button>
 
         <div className="mt-4 text-center text-gray-400 text-sm">OR</div>

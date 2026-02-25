@@ -6,50 +6,48 @@ import {
   fetchDetails,
   fetchSeasonDetails,
 } from "./content.service.js";
+import logger from "../../utils/logger.js";
 
 /* ======================================================
    MOVIES HOME
 ====================================================== */
-export const getMoviesHome = async (req, res) => {
+export const getMoviesHome = async (req, res, next) => {
   try {
     const data = await fetchMoviesHome();
     return success(res, data);
   } catch (err) {
-    console.error("getMoviesHome failed:", err);
-    return failure(res, "Failed to load movies feed");
+    next(err);
   }
 };
 
 /* ======================================================
    TV HOME
 ====================================================== */
-export const getTvHome = async (req, res) => {
+export const getTvHome = async (req, res, next) => {
   try {
     const data = await fetchTvHome();
     return success(res, data);
   } catch (err) {
-    console.error("getTvHome failed:", err);
-    return failure(res, "Failed to load TV feed");
+    next(err);
   }
 };
 
 /* ======================================================
    ANIME HOME
 ====================================================== */
-export const getAnimeHome = async (req, res) => {
+export const getAnimeHome = async (req, res, next) => {
   try {
     const data = await fetchAnimeHome();
     return success(res, data);
   } catch (err) {
-    console.error("getAnimeHome failed:", err);
-    return failure(res, "Failed to load anime feed");
+    next(err);
   }
 };
 
 /* ======================================================
    DETAILS
 ====================================================== */
-export const getDetails = async (req, res) => {
+export const getDetails = async (req, res, next) => {
   try {
     const { type, id } = req.params;
 
@@ -71,15 +69,14 @@ export const getDetails = async (req, res) => {
 
     return success(res, data);
   } catch (err) {
-    console.error("getDetails failed:", err);
-    return failure(res, "Failed to fetch details");
+    next(err);
   }
 };
 
 /* ======================================================
    SEASON DETAILS
 ====================================================== */
-export const getSeasonDetails = async (req, res) => {
+export const getSeasonDetails = async (req, res, next) => {
   try {
     const { id, seasonNumber } = req.params;
 
@@ -99,7 +96,6 @@ export const getSeasonDetails = async (req, res) => {
 
     return success(res, data);
   } catch (err) {
-    console.error("getSeasonDetails failed:", err);
-    return failure(res, "Failed to fetch season details");
+    next(err);
   }
 };

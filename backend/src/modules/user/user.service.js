@@ -3,6 +3,7 @@ import { userCollection } from "./user.model.js";
 import { ACCOUNT_STATUS } from "../../constants/accountStatus.js";
 import { terminateSubscriptionImmediately } from "../subscription/subscription.service.js";
 import admin from "firebase-admin";
+import logger from "../../utils/logger.js";
 
 const usersRef = firestore.collection(userCollection);
 const now = () => admin.firestore.Timestamp.now();
@@ -204,7 +205,7 @@ export const deleteUser = async (uid) => {
   try {
     await terminateSubscriptionImmediately(uid);
   } catch (e) {
-    console.error("Failed to terminate subscription during user delete", e);
+    logger.error("Failed to terminate subscription during user delete", e);
   }
 
   // Soft delete in Firestore
@@ -222,7 +223,7 @@ export const deleteUser = async (uid) => {
     await admin.auth().deleteUser(uid);
   } catch (e) {
     if (e.code !== "auth/user-not-found") {
-      console.error("Failed to delete auth user", e);
+      logger.error("Failed to delete auth user", e);
     }
   }
 

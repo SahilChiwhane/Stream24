@@ -17,7 +17,7 @@ const TMDB_BASE = "https://api.themoviedb.org/3";
 const TMDB_KEY = process.env.TMDB_API_KEY;
 
 if (!TMDB_KEY) {
-  console.warn("TMDB_API_KEY not set — TMDB resolver will fail");
+  logger.warn("TMDB_API_KEY not set — TMDB resolver will fail");
 }
 
 // ================================
@@ -134,7 +134,7 @@ const CONTENT_OVERRIDES = {
 // ================================
 export const searchYouTubeFallback = async (query) => {
   if (!YOUTUBE_API_KEY) {
-    console.warn("[PLAYBACK] No YOUTUBE_API_KEY — cannot search fallback");
+    logger.warn("[PLAYBACK] No YOUTUBE_API_KEY — cannot search fallback");
     return null;
   }
 
@@ -318,7 +318,7 @@ export const resolveTrailer = async (
     const normalizedType = normalizeContentType(contentType);
 
     if (!normalizedType) {
-      console.error("Invalid contentType:", contentType);
+      logger.error("Invalid contentType:", contentType);
       return null;
     }
 
@@ -557,7 +557,7 @@ export const resolveTrailer = async (
       loopWindow: await getLoopWindow(validKeys[0]),
     };
   } catch (err) {
-    console.error("Trailer resolve failed:", err.message);
+    logger.error("Trailer resolve failed:", err.message);
     return null;
   }
 };

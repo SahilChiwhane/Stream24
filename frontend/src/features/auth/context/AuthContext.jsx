@@ -40,10 +40,12 @@ export const AuthProvider = ({ children }) => {
 
       let profile = {};
       try {
-        const profileRes = await api.get("/users/me");
+        const profileRes = await api.get("/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         profile = profileRes.data?.data?.profile || {};
       } catch (pErr) {
-        console.warn("Profile fetch skipped during bootstrap:", pErr.message);
+        // Silenced for cleaner bootstrap
       }
 
       // Hydrate from profile with flattening fallback
@@ -69,7 +71,9 @@ export const AuthProvider = ({ children }) => {
         metadata: fbUser.metadata,
       });
     } catch (err) {
-      console.error("Auth session fetch failed:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Auth session fetch failed:", err);
+      }
       // Don't null out user on minor errors, but log it
     } finally {
       if (fetchingSessionRef.current === currentUid) {

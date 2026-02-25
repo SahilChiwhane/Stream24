@@ -1,10 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import BGImg from "../../../assets/BGImg.png";
+import BGImg from "../../../assets/authBg.png";
 
 const PLANS = [
   { id: "basic", name: "Basic", price: 199, label: "HD • 1 Device" },
-  { id: "standard", name: "Standard", price: 499, label: "Full HD • 2 Devices", recommended: true },
+  {
+    id: "standard",
+    name: "Standard",
+    price: 499,
+    label: "Full HD • 2 Devices",
+    recommended: true,
+  },
   { id: "premium", name: "Premium", price: 799, label: "4K HDR • 4 Devices" },
 ];
 
@@ -16,12 +22,12 @@ export default function CheckoutPage() {
   const incomingPlan = location?.state?.plan || null;
 
   const [selectedPlan, setSelectedPlan] = useState(
-    incomingPlan?.id || "standard"
+    incomingPlan?.id || "standard",
   );
 
   const plan = useMemo(
     () => PLANS.find((p) => p.id === selectedPlan),
-    [selectedPlan]
+    [selectedPlan],
   );
 
   // Scroll to top on load
@@ -42,7 +48,6 @@ export default function CheckoutPage() {
       style={{ backgroundImage: `url(${BGImg})`, backgroundSize: "cover" }}
     >
       <div className="w-full max-w-2xl bg-black/85 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-8 text-white">
-
         {/* Header */}
         <h1 className="text-2xl font-extrabold text-center">
           Confirm your subscription
@@ -65,9 +70,10 @@ export default function CheckoutPage() {
                 className={`
                   rounded-xl p-4 text-left border transition-all duration-200
                   bg-[#0d0f12]
-                  ${active
-                    ? "border-blue-400 shadow-[0_0_25px_rgba(96,165,250,0.5)] scale-[1.03]"
-                    : "border-white/10 hover:border-white/30"
+                  ${
+                    active
+                      ? "border-blue-400 shadow-[0_0_25px_rgba(96,165,250,0.5)] scale-[1.03]"
+                      : "border-white/10 hover:border-white/30"
                   }
                 `}
               >

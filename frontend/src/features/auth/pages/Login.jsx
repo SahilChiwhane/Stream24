@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BGImg from "../../../assets/BGImgg.png";
+import BGImg from "../../../assets/authBg.png";
 import { useNavigate, Link } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
@@ -138,12 +138,22 @@ export default function Login() {
 
       navigate(destination, { replace: true });
     } catch (err) {
-      console.error("❌ Login error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("❌ Login error:", err);
+        if (err.message === "Network Error") {
+          console.error(
+            "🌐 API Network Error: Check if server is reachable and firewall allows port 5051",
+          );
+        }
+      }
+
       setErrors({
         general:
           err?.code === "auth/invalid-credential"
             ? "Invalid email or password."
-            : "Login failed — please try again.",
+            : err?.code === "auth/unauthorized-domain"
+              ? "This domain is not authorized in Firebase Console (add your local IP)."
+              : `Login failed: ${err?.code || err.message}. check network connectivity.`,
       });
     } finally {
       setSubmitting(false);

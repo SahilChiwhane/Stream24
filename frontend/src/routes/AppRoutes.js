@@ -41,6 +41,7 @@ const SubscriptionFailed = lazy(
 );
 
 const NotFound = lazy(() => import("../shared/pages/NotFound"));
+const AboutContact = lazy(() => import("../pages/AboutContact"));
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -66,6 +67,8 @@ export default function AppRoutes() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/auth/redirect" element={<AuthRedirect />} />
           <Route path="/plans" element={<Plans />} />
+          <Route path="/about" element={<AboutContact />} />
+          <Route path="/contact" element={<AboutContact />} />
         </Route>
 
         {/* ---------------- AUTHENTICATED APP ---------------- */}

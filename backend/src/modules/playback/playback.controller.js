@@ -13,7 +13,7 @@ import { fetchDetails } from "../content/content.service.js";
 import logger from "../../utils/logger.js";
 import cache from "../../utils/cache.js";
 
-export const resolvePlayback = async (req, res) => {
+export const resolvePlayback = async (req, res, next) => {
   try {
     const uid = req.user?.uid || "DEV_UID";
     const { contentId, contentType, season, episode } = req.body;
@@ -227,15 +227,14 @@ export const resolvePlayback = async (req, res) => {
       ...playbackResult,
     });
   } catch (err) {
-    logger.error(`Playback resolution failed: ${err.message}`);
-    return failure(res, "Failed to resolve playback", 500);
+    next(err);
   }
 };
 
 /**
  * AUTOPLAY / NEXT EPISODE
  */
-export const getNextPlayback = async (req, res) => {
+export const getNextPlayback = async (req, res, next) => {
   try {
     const uid = req.user.uid;
     const { type, contentType, contentId, seriesId, season, episode } =
@@ -258,15 +257,14 @@ export const getNextPlayback = async (req, res) => {
 
     return success(res, result, "Next playback resolved");
   } catch (err) {
-    logger.error(`Autoplay resolution failed: ${err.message}`);
-    return failure(res, err.message, 500);
+    next(err);
   }
 };
 
 /**
  * RESUME PLAYBACK
  */
-export const resumePlayback = async (req, res) => {
+export const resumePlayback = async (req, res, next) => {
   try {
     const uid = req.user.uid;
     const { contentId, season, episode } = req.query;
@@ -284,7 +282,6 @@ export const resumePlayback = async (req, res) => {
 
     return success(res, result, "Resume resolved");
   } catch (err) {
-    logger.error(`Resume resolution failed: ${err.message}`);
-    return failure(res, err.message, 500);
+    next(err);
   }
 };

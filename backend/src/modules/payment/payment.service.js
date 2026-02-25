@@ -4,6 +4,7 @@ import { firestore } from "../../config/firebase.js";
 import { subscriptionCollection } from "../subscription/subscription.model.js";
 import { ACCOUNT_STATUS } from "../../constants/accountStatus.js";
 import { updateUserProfile } from "../user/user.service.js";
+import logger from "../../utils/logger.js";
 
 const subRef = firestore.collection(subscriptionCollection);
 
@@ -54,7 +55,7 @@ export const createOrder = async ({ uid, planId, amount }) => {
 
     return order;
   } catch (rawErr) {
-    console.error("Razorpay create-order failed:", rawErr);
+    logger.error("Razorpay create-order failed:", rawErr);
 
     const message =
       rawErr?.error?.description ||
@@ -148,7 +149,7 @@ export const verifyAndActivate = async ({
       accountStatus: ACCOUNT_STATUS.ACCOUNT_READY,
     });
   } catch (err) {
-    console.warn("Proactive status update failed (non-critical):", err.message);
+    logger.warn("Proactive status update failed (non-critical):", err.message);
   }
 
   return {

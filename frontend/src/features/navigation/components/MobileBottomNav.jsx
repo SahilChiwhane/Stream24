@@ -101,7 +101,7 @@ const MobileBottomNav = ({
               />
             ) : initials ? (
               <div
-                className="w-full h-full rounded-full flex items-center justify-center font-black text-[10px] tracking-tighter"
+                className="w-full h-full rounded-xl flex items-center justify-center font-black text-[10px] tracking-tighter"
                 style={{ background: bg, color: "#000" }}
               >
                 {initials}

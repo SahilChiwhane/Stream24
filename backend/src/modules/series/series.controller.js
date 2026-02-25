@@ -1,7 +1,7 @@
 import { success, failure } from "../../utils/response.js";
 import { resolveNextEpisode } from "./series.service.js";
 
-export const getNextEpisode = async (req, res) => {
+export const getNextEpisode = async (req, res, next) => {
   try {
     const { seriesId, season, episode } = req.query;
 
@@ -17,6 +17,6 @@ export const getNextEpisode = async (req, res) => {
 
     return success(res, result, "Next episode resolved");
   } catch (err) {
-    return failure(res, err.message, 500);
+    next(err);
   }
 };

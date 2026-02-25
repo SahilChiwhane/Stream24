@@ -29,8 +29,6 @@ export const updateMe = async (req, res, next) => {
 
     return success(res, { profile: updated }, "Profile updated");
   } catch (err) {
-    logger.error(`Profile update failed for ${req.user.uid}: ${err.message}`);
-
     // Handle validation errors
     if (err.status === 400 && err.details) {
       return res.status(400).json({

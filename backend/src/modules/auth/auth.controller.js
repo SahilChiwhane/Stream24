@@ -7,6 +7,7 @@ import {
 import { getUserSubscription } from "../subscription/subscription.service.js";
 import { authAdmin } from "../../config/firebase.js";
 import { ACCOUNT_STATUS } from "../../constants/accountStatus.js";
+import logger from "../../utils/logger.js";
 
 /**
  * Health check
@@ -22,6 +23,7 @@ export const healthCheck = (req, res) => {
 export const signupComplete = async (req, res, next) => {
   try {
     const { uid } = req.user;
+    logger.auth(`Completing signup for UID: ${uid}`);
 
     // Firebase is identity authority
     const fbUser = await authAdmin.getUser(uid);
@@ -80,6 +82,7 @@ export const resolveSession = async (req, res, next) => {
   try {
     const uid = req.user.uid;
     const email = req.user.email;
+    logger.auth(`Resolving session for ${email} (${uid})`);
 
     // Firebase is verification authority
     const userRecord = await authAdmin.getUser(uid);
@@ -96,6 +99,7 @@ export const resolveSession = async (req, res, next) => {
 
     if (emailVerified && accountStatus === ACCOUNT_STATUS.SIGNED_UP) {
       accountStatus = ACCOUNT_STATUS.EMAIL_VERIFIED;
+      logger.auth(`User ${uid} transitioned to EMAIL_VERIFIED`);
     }
 
     if (
@@ -104,6 +108,7 @@ export const resolveSession = async (req, res, next) => {
       accountStatus !== ACCOUNT_STATUS.ACCOUNT_READY
     ) {
       accountStatus = ACCOUNT_STATUS.ACCOUNT_READY;
+      logger.auth(`User ${uid} transitioned to ACCOUNT_READY`);
     }
 
     if (
@@ -148,6 +153,7 @@ export const resolveSession = async (req, res, next) => {
  */
 export const logout = async (req, res, next) => {
   try {
+    logger.auth(`Revoking session for UID: ${req.user.uid}`);
     await authAdmin.revokeRefreshTokens(req.user.uid);
     return success(res, null, "Session revoked");
   } catch (err) {

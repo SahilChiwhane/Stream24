@@ -11,7 +11,7 @@ export const errorHandler = (err, req, res, next) => {
   );
 
   if (!isProd && err.stack) {
-    console.error(err.stack);
+    logger.error(err.stack);
   }
 
   return res.status(status).json({

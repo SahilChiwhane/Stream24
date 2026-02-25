@@ -55,21 +55,21 @@ export default function Player() {
     async (currentProgress) => {
       if (!detailsRef.current || completedRef.current) return;
 
+      // Priority: 1. Real Stream Duration > 2. Universal Trailer Baseline (150s)
+      let resolvedDuration =
+        durationRef.current && durationRef.current > 0
+          ? durationRef.current
+          : 150; // Standard 2.5m trailer baseline for demo UX
+
       const progress =
         typeof currentProgress === "number"
           ? currentProgress
           : progressRef.current;
 
-      // Priority: 1. API Duration (Stream Length)
-      let resolvedDuration = durationRef.current;
-
       // CRITICAL: Block saving ONLY if we have no progress.
-      // We still try to save even if duration is missing (as null)
-      // so the record is created in the database.
       if (progress <= 0) return;
 
-      let durationToSave =
-        resolvedDuration && resolvedDuration > 0 ? resolvedDuration : null;
+      let durationToSave = resolvedDuration;
 
       // Double-check to ensure 0 never leaks as duration
       if (durationToSave === 0) durationToSave = null;
@@ -417,7 +417,7 @@ export default function Player() {
             src={urlWithStart}
             title="Stream24 Player"
             className="w-full h-full border-0"
-            allow="autoplay; encrypted-media"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             onLoad={startPolling}
           />

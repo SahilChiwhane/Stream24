@@ -10,11 +10,13 @@ import { useAuth } from "../../auth/context/AuthContext";
 const WishlistContext = createContext(null);
 
 export function WishlistProvider({ children }) {
-  const { user } = useAuth();
+  const { user, initialized } = useAuth();
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!initialized) return;
+
     let mounted = true;
 
     if (!user) {
@@ -39,7 +41,7 @@ export function WishlistProvider({ children }) {
     return () => {
       mounted = false;
     };
-  }, [user]);
+  }, [user, initialized]);
 
   const add = async (item) => {
     await addWishlist(item);

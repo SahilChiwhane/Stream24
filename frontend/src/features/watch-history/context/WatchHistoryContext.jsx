@@ -15,12 +15,14 @@ import { useAuth } from "../../auth/context/AuthContext";
 const WatchHistoryContext = createContext(null);
 
 export function WatchHistoryProvider({ children }) {
-  const { user } = useAuth();
+  const { user, initialized } = useAuth();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const loadHistory = useCallback(async () => {
+    if (!initialized) return;
+
     if (!user) {
       setHistory([]);
       setLoading(false);
@@ -37,11 +39,13 @@ export function WatchHistoryProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, initialized]);
 
   useEffect(() => {
-    loadHistory();
-  }, [loadHistory]);
+    if (initialized) {
+      loadHistory();
+    }
+  }, [loadHistory, initialized]);
 
   const removeFromHistory = useCallback(async (historyId) => {
     try {

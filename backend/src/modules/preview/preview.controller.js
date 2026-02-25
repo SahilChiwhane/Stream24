@@ -1,7 +1,7 @@
 import { success, failure } from "../../utils/response.js";
 import { resolvePreview } from "./preview.service.js";
 
-export const resolvePreviewController = async (req, res) => {
+export const resolvePreviewController = async (req, res, next) => {
   try {
     const { contentId, contentType } = req.query;
 
@@ -17,6 +17,6 @@ export const resolvePreviewController = async (req, res) => {
 
     return success(res, { preview });
   } catch (err) {
-    return failure(res, "Failed to resolve preview", 500);
+    next(err);
   }
 };

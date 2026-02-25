@@ -7,7 +7,7 @@ export default function DeleteAccountSection({ auth, onAccountDeleted }) {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const canDelete = confirmText === "DELETE";
+  const canDelete = confirmText.trim().toUpperCase() === "DELETE";
 
   const triggerDelete = () => {
     if (!canDelete || loading) return;

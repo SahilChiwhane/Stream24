@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import StreamingExp from "../../../assets/streamExp3.png";
+import StreamingExp from "../../../assets/streamExp.png";
 
 const StreamingBenefitsSection = () => {
   const ref = useRef(null);

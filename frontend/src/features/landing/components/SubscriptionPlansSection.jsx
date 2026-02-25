@@ -140,16 +140,7 @@ const SubscriptionPlansSection = () => {
         prefill: { email: user.email },
         config: {
           display: {
-            blocks: {
-              methods: {
-                name: "Payment Methods",
-                methods: ["upi", "netbanking", "wallet"], // Explicitly omit 'card'
-              },
-            },
-            sequence: ["block.methods"],
-            preferences: {
-              show_default_blocks: false,
-            },
+            hide: [{ method: "card" }],
           },
         },
         handler: async (paymentRes) => {

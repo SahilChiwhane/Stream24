@@ -42,8 +42,7 @@ export const initFirebaseAdmin = () => {
       credential: admin.credential.cert(creds),
     });
 
-    logger.auth("Firebase Admin Authority established (PRODUCTION)");
-    logger.info(`Linked Project: ${creds.project_id}`);
+    logger.auth("Firebase Admin Authority established");
   }
 
   initialized = true;

@@ -1,11 +1,9 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
 import { useWatchHistory } from "../../../features/watch-history/context/WatchHistoryContext";
 import Carousel from "../../browse/components/Carousel";
 
 export default function ResumeWatching() {
   const { history, loading, removeFromHistory, refresh } = useWatchHistory();
-  const location = useLocation();
 
   // Industrial Refresh: Re-sync on mount to ensure latest progress is visible
   React.useEffect(() => {
@@ -42,20 +40,16 @@ export default function ResumeWatching() {
       String(i.mediaType).toLowerCase().includes("anime");
 
     // 2. Calculate duration and progress
-    // Priority: Saved duration (real video) > Runtime seconds > Metadata runtime
+    // Priority: Measured Trailer length (i.durationSeconds) > Trailer Baseline (150s)
     const dur =
-      i.durationSeconds ||
-      i.runtimeSeconds ||
-      (i.runtime ? i.runtime * 60 : null);
+      i.durationSeconds && i.durationSeconds > 0 ? i.durationSeconds : 150;
 
-    // hasDuration > 0 ensures short videos like trailers don't have their progress zeroed out
-    const hasDuration = dur && dur > 0;
-    const ratio = hasDuration ? i.progress / dur : 0;
-    const remaining = hasDuration ? dur - i.progress : Infinity;
+    // 150s baseline ensures short videos like trailers don't have their progress zeroed out
+    const ratio = i.progress / dur;
+    const remaining = dur - i.progress;
 
     // Completion logic: If > 95% finished OR strictly within 10s of the end
-    const isCompleted =
-      hasDuration && (ratio >= 0.95 || (dur > 10 && remaining < 10));
+    const isCompleted = ratio >= 0.95 || (dur > 10 && remaining < 10);
     const isTooEarly = i.progress < 1.5;
 
     // 3. Filter out completed or transient watch sessions
@@ -87,8 +81,7 @@ export default function ResumeWatching() {
       season: i.season,
       episode: i.episode,
       progress: i.progress,
-      // Fallback for UI if duration is unknown (1.5m baseline for trailers)
-      duration: dur || 90,
+      duration: dur,
     });
 
     return acc;

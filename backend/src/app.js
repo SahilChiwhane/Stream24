@@ -1,5 +1,8 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import compression from "compression";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 
@@ -25,9 +28,17 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { cacheMiddleware } from "./middlewares/cache.middleware.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
+if (env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 // --- CORE MIDDLEWARE ---
+app.use(compression()); // ⚡ Compress all responses
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -46,10 +57,44 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(morgan(env.NODE_ENV === "production" ? "tiny" : "dev"));
 
 // --- SERVER HARDENING ---
-app.use(helmet()); // Security Headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "script-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://checkout.razorpay.com",
+          "https://www.youtube.com",
+          "https://s.ytimg.com",
+        ],
+        "frame-src": [
+          "'self'",
+          "https://api.razorpay.com",
+          "https://www.youtube.com",
+          "https://www.youtube-nocookie.com",
+        ],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://*.tmdb.org",
+          "https://image.tmdb.org",
+          "https://lh3.googleusercontent.com",
+        ],
+        "connect-src": [
+          "'self'",
+          "https://api.razorpay.com",
+          "https://firebasestorage.googleapis.com",
+          "https://www.googleapis.com",
+        ],
+      },
+    },
+  }),
+);
 // Rate Limiting: 100 requests per 15 minutes per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -69,18 +114,6 @@ app.get("/", (req, res) =>
 );
 
 // --- API ROUTES (v1 namespace) ---
-// DEBUG: Watch History Traffic Monitor
-app.use("/api/v1/watch-history", (req, res, next) => {
-  if (req.method === "POST" || req.method === "GET") {
-    const time = new Date().toLocaleTimeString();
-    console.log(
-      `\n\x1b[44m[WATCH-HISTORY TRAFFIC]\x1b[0m ${time} | ${req.method} | Body:`,
-      JSON.stringify(req.body),
-    );
-  }
-  next();
-});
-
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/payments", paymentRoutes);
@@ -100,6 +133,25 @@ app.use("/api/v1/playback", playbackRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
 app.use("/api/v1/preferences", preferencesRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
+
+// --- STATIC ASSETS (Production) ---
+const buildPath = path.join(__dirname, "../../frontend/build");
+app.use(express.static(buildPath));
+
+// Catch-all for React Routing
+app.get("*", (req, res, next) => {
+  if (req.url.startsWith("/api/v1")) return next();
+  res.sendFile(path.join(buildPath, "index.html"), (err) => {
+    if (err) {
+      // If we don't have a build folder yet, just show a friendly message
+      res.status(404).json({
+        ok: false,
+        message:
+          "Production build not found. Run 'npm run build' in the frontend folder.",
+      });
+    }
+  });
+});
 
 // --- GLOBAL ERROR HANDLER ---
 app.use(errorHandler);

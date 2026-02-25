@@ -20,7 +20,7 @@ export const searchMulti = async (query, page = 1) => {
 
   const raw = await response.json();
 
-  // BLACKLIST: Filter out cartoons (Kodomo) from general results for consistency
+  // BLACKLIST: Filter out cartoons (Kodomo) and "junk" content for consistency
   const BLACKLIST = [
     "Doraemon",
     "Shin-chan",
@@ -38,17 +38,34 @@ export const searchMulti = async (query, page = 1) => {
     "Hamtaro",
     "BeyBlade",
     "Digimon",
+    "Influencer",
+    "Vlog",
+    "Review",
+    "Reaction",
+    "Unboxing",
+    "Pili",
   ];
 
   let baseResults = (raw.results || [])
-    .map((item) => mapTMDBItem(item))
     .filter((item) => {
+      // 1. STRICT TYPE FILTER
+      if (item.media_type !== "movie" && item.media_type !== "tv") return false;
+
+      // 2. QUALITY GATE
+      if ((item.popularity || 0) < 0.6 && !item.poster_path) return false;
+
       const name = (item.title || item.name || "").toLowerCase();
+
+      // 3. BLACKLIST CHECK
       const isBlacklisted = BLACKLIST.some((term) =>
         name.includes(term.toLowerCase()),
       );
-      return !isBlacklisted;
-    });
+      if (isBlacklisted) return false;
+
+      // 4. MUST HAVE MINIMUM DATA
+      return !!(item.poster_path || item.backdrop_path);
+    })
+    .map((item) => mapTMDBItem(item));
 
   // Netflix-Style Expansion: Expand TV shows into separate seasons in search
   const expandedResults = [];

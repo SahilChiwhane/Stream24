@@ -1,7 +1,7 @@
 import { success, failure } from "../../utils/response.js";
 import { logPlaybackEvent } from "./analytics.service.js";
 
-export const trackPlaybackEvent = async (req, res) => {
+export const trackPlaybackEvent = async (req, res, next) => {
   try {
     const uid = req.user.uid;
     const { contentId, contentType, event, meta } = req.body;
@@ -20,6 +20,6 @@ export const trackPlaybackEvent = async (req, res) => {
 
     return success(res, result, "Event tracked");
   } catch (err) {
-    return failure(res, err.message || "Tracking failed");
+    next(err);
   }
 };

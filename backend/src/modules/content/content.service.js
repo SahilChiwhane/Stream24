@@ -94,6 +94,7 @@ const BLACKLIST = [
   "Hamtaro",
   "BeyBlade",
   "Digimon",
+  "Pili",
 ];
 
 const filterBlacklisted = (items) =>
@@ -300,12 +301,7 @@ export const fetchTvHome = async () => {
   );
 
   const filterTv = (items) =>
-    items
-      .filter((i) => !isAnime(i))
-      .filter((i) => {
-        const name = (i.name || i.title || "").toLowerCase();
-        return !BLACKLIST.some((term) => name.includes(term.toLowerCase()));
-      });
+    filterBlacklisted(items).filter((i) => !isAnime(i));
 
   const trending = filterTv(trendingRaw).map((i) => mapTMDB(i));
   const popular = filterTv(popularRaw).map((i) => mapTMDB(i));
@@ -543,7 +539,9 @@ export const fetchDetails = async (type, id) => {
           ? `https://image.tmdb.org/t/p/w185${c.profile_path}`
           : null,
       })) || [],
-    similar: recommendations?.results?.map((i) => mapTMDB(i)) || [],
+    similar: recommendations?.results
+      ? filterBlacklisted(recommendations.results).map((i) => mapTMDB(i))
+      : [],
     number_of_seasons:
       details.number_of_seasons || baseData.number_of_seasons || null,
     seasons: details.seasons || baseData.seasons || [],

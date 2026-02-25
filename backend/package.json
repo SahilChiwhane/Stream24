@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "predev": "netstat -ano | findstr :5050 >nul 2>&1 && (for /f \"tokens=5\" %a in ('netstat -ano ^| findstr :5050') do if not \"%a\"==\"0\" if not \"%a\"==\"-\" taskkill /F /PID %a /T >nul 2>&1) || echo Port 5050 clear",
-    "dev": "nodemon src/server.js"
+    "predev": "scripts\\cleanup.bat 5051",
+    "dev": "nodemon --quiet src/server.js"
   },
   "keywords": [],
   "author": "",

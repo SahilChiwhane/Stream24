@@ -89,6 +89,21 @@ export default function Details() {
     };
   }, []);
 
+  const loadSeason = useCallback(
+    async (num) => {
+      try {
+        setLoadingSeason(true);
+        const data = await getSeasonDetails(id, num);
+        setSeasonData(data);
+      } catch (err) {
+        // Failed to load season details
+      } finally {
+        setLoadingSeason(false);
+      }
+    },
+    [id],
+  );
+
   useEffect(() => {
     let mounted = true;
 
@@ -298,7 +313,7 @@ export default function Details() {
             }
           },
           onError: (event) => {
-            console.warn("[PLAYER] API Error:", event.data);
+            // API Error
           },
         },
       };
@@ -314,7 +329,6 @@ export default function Details() {
           playerOptions,
         );
       } else {
-        console.log("[PLAYER] Fast-Switching to:", trailerUrl);
         try {
           playerRef.current.loadVideoById({
             videoId: trailerUrl,
@@ -365,21 +379,6 @@ export default function Details() {
       }
     };
   }, []);
-
-  const loadSeason = useCallback(
-    async (num) => {
-      try {
-        setLoadingSeason(true);
-        const data = await getSeasonDetails(id, num);
-        setSeasonData(data);
-      } catch (err) {
-        console.error("Failed to load season details:", err);
-      } finally {
-        setLoadingSeason(false);
-      }
-    },
-    [id],
-  );
 
   const handleSeasonChange = async (num) => {
     setSelectedSeason(num);
@@ -441,9 +440,7 @@ export default function Details() {
         }
       }
     } catch (e) {
-      console.warn(
-        "[DETAILS] Failed to update ambient trailer for season change",
-      );
+      // Failed to update ambient trailer for season change
     }
   };
 
@@ -588,23 +585,6 @@ export default function Details() {
                 <FaPlay size={14} />
                 {progress > 0 ? "Resume" : "Play Now"}
               </button>
-
-              {progress > 0 && historyItem?.durationSeconds > 0 && (
-                <div className="flex flex-col justify-center min-w-[120px]">
-                  <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-red-600"
-                      style={{
-                        width: `${Math.max(3, (progress / historyItem.durationSeconds) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-gray-400 mt-1 font-bold">
-                    {Math.round((progress / historyItem.durationSeconds) * 100)}
-                    % Watched
-                  </span>
-                </div>
-              )}
 
               <button
                 onClick={() =>
