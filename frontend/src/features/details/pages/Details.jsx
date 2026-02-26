@@ -14,7 +14,6 @@ import {
   FaHeart,
   FaClock,
 } from "react-icons/fa";
-import Loader from "../../../shared/components/Loader";
 import {
   fetchWatchHistory,
   upsertWatchHistory,
