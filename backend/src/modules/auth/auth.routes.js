@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { verifyAuth } from "../../middlewares/auth.middleware.js";
+import {
+  verifyAuth,
+  verifyAuthStrict,
+} from "../../middlewares/auth.middleware.js";
 import { noCache } from "../../middlewares/cache.middleware.js";
 import {
   healthCheck,
@@ -13,6 +16,7 @@ const router = Router();
 router.get("/health", healthCheck);
 router.post("/signup-complete", verifyAuth, noCache, signupComplete);
 router.get("/session", verifyAuth, noCache, resolveSession);
-router.post("/logout", verifyAuth, noCache, logout);
+// Logout uses strict verification (revocation check) since it actually revokes tokens
+router.post("/logout", verifyAuthStrict, noCache, logout);
 
 export default router;

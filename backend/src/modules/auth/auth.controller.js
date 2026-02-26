@@ -22,13 +22,11 @@ export const healthCheck = (req, res) => {
  */
 export const signupComplete = async (req, res, next) => {
   try {
-    const { uid } = req.user;
+    const { uid, email } = req.user;
     logger.auth(`Completing signup for UID: ${uid}`);
 
-    // Firebase is identity authority
-    const fbUser = await authAdmin.getUser(uid);
-    if (!fbUser?.email) {
-      throw new Error("Firebase user missing email");
+    if (!email) {
+      throw new Error("User email missing from token");
     }
 
     const {
@@ -38,7 +36,7 @@ export const signupComplete = async (req, res, next) => {
     } = req.body || {};
 
     const user = await createUserIfNotExists(uid, {
-      email: fbUser.email,
+      email: email,
       role: "user",
       accountStatus: ACCOUNT_STATUS.SIGNED_UP,
 
@@ -55,7 +53,7 @@ export const signupComplete = async (req, res, next) => {
 
       planIntent,
       funnel,
-      emailVerified: fbUser.emailVerified === true,
+      emailVerified: req.user.emailVerified === true,
       source: "firebase",
     });
 

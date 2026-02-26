@@ -109,20 +109,22 @@ export default function Details() {
 
     async function loadData() {
       try {
-        // Only show full page loader if we have NO data at all
         if (!details) {
           setLoading(true);
         }
 
-        const data = await getContentDetails(mediaType, id);
-        if (!mounted) return;
-        setDetails(data);
-
-        const isEpisodic = data.mediaType === "tv";
         const searchParams = new URLSearchParams(window.location.search);
         const urlSeason = searchParams.get("season");
 
-        const history = await fetchWatchHistory().catch(() => []);
+        // ⚡ Fire content fetch + watch history IN PARALLEL — don't wait sequentially
+        const [data, history] = await Promise.all([
+          getContentDetails(mediaType, id),
+          fetchWatchHistory().catch(() => []),
+        ]);
+
+        if (!mounted) return;
+        setDetails(data);
+
         const existingItem = history.find(
           (h) => String(h.contentId) === String(id),
         );
@@ -131,6 +133,7 @@ export default function Details() {
           setHistoryItem(existingItem);
         }
 
+        const isEpisodic = data.mediaType === "tv";
         const s =
           isEpisodic && urlSeason
             ? Number(urlSeason)
@@ -164,6 +167,7 @@ export default function Details() {
             : { start: 0, end: 15 };
         }
 
+        // ⚡ Kick off playback resolution immediately — doesn't block page render
         resolvePlayback({
           contentId: id,
           contentType: data.mediaType,
@@ -182,7 +186,6 @@ export default function Details() {
               }
             }
 
-            // Still update loop/fallbacks from API if available and not set by override
             if (pb?.loopWindow && !isDeathNote && !isZootopia2) {
               loopRef.current = {
                 start: pb.loopWindow.start,
@@ -220,8 +223,9 @@ export default function Details() {
   }, [id, mediaType]);
 
   // INDUSTRIAL PLAYER CORE
+  // ⚡ Don't gate on `loading` — start player as soon as we have a trailerUrl + YT API ready
   useEffect(() => {
-    if (!apiLoaded || loading) return;
+    if (!apiLoaded) return;
 
     const runLoopCheck = () => {
       const p = playerRef.current;
@@ -346,7 +350,7 @@ export default function Details() {
       }
     };
 
-    const timer = setTimeout(initOrUpdatePlayer, 150);
+    const timer = setTimeout(initOrUpdatePlayer, 50);
 
     // Dynamic Interval Manager: Works across re-renders and fast switches
     let interval = null;
@@ -362,7 +366,6 @@ export default function Details() {
   }, [
     trailerUrl,
     apiLoaded,
-    loading,
     isVideoReady,
     allFallbacks,
     historyItem,
@@ -452,7 +455,70 @@ export default function Details() {
   };
 
   if (!details && loading) {
-    return <Loader />;
+    return (
+      <div className="min-h-screen bg-black text-white">
+        {/* ── Hero skeleton ── */}
+        <div className="relative w-full min-h-[85vh] md:min-h-[90vh] bg-black overflow-hidden flex flex-col justify-end">
+          {/* Backdrop shimmer */}
+          <div className="skeleton absolute inset-0 rounded-none" />
+          {/* Gradient overlays matching real layout */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
+
+          {/* Bottom content skeleton */}
+          <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-12 max-w-3xl space-y-4">
+            {/* Meta row: year · rating · type · runtime */}
+            <div className="flex gap-3">
+              <div className="hero-skeleton-block h-4 w-10 rounded-full" />
+              <div className="hero-skeleton-block h-4 w-12 rounded-full" />
+              <div className="hero-skeleton-block h-4 w-14 rounded-full" />
+              <div className="hero-skeleton-block h-4 w-16 rounded-full" />
+            </div>
+            {/* Title — two staggered lines */}
+            <div className="hero-skeleton-block h-10 md:h-14 w-4/5 rounded-lg" />
+            <div className="hero-skeleton-block h-10 md:h-14 w-3/5 rounded-lg" />
+            {/* Tagline */}
+            <div className="hero-skeleton-block h-4 w-2/5 rounded" />
+            {/* Action buttons */}
+            <div className="flex gap-4 pt-2">
+              <div className="hero-skeleton-block h-12 w-32 rounded-lg" />
+              <div className="hero-skeleton-block h-12 w-28 rounded-lg" />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Content area skeleton ── */}
+        <div className="px-6 md:px-12 pt-10 pb-6 space-y-10 bg-black">
+          {/* Overview section */}
+          <div className="max-w-3xl space-y-3">
+            <div className="skeleton h-4 w-24 rounded" />
+            <div className="skeleton h-3 w-full rounded" />
+            <div className="skeleton h-3 w-5/6 rounded" />
+            <div className="skeleton h-3 w-4/6 rounded" />
+            {/* Genre chips */}
+            <div className="flex gap-2 pt-2">
+              <div className="skeleton h-6 w-16 rounded-full" />
+              <div className="skeleton h-6 w-20 rounded-full" />
+              <div className="skeleton h-6 w-14 rounded-full" />
+            </div>
+          </div>
+
+          {/* Cast row */}
+          <div className="space-y-4">
+            <div className="skeleton h-6 w-28 rounded" />
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 space-y-2">
+                  <div className="skeleton w-24 h-24 md:w-36 md:h-36 rounded-2xl" />
+                  <div className="skeleton h-3 w-20 rounded" />
+                  <div className="skeleton h-3 w-16 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!details) return null;

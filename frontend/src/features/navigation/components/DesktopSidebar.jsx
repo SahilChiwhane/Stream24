@@ -21,13 +21,17 @@ const DesktopSidebar = ({
 
   return (
     <aside
-      className={`
+      className="
         fixed top-0 left-0 h-screen flex flex-col z-50 overflow-hidden
         bg-gradient-to-b from-[#0d0d0d] to-[#040404]
         border-r border-white/[0.05] shadow-[10px_0_50px_rgba(0,0,0,0.8)]
-        transition-[width] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)]
-      `}
-      style={{ width: "var(--sidebar-current)" }}
+      "
+      style={{
+        width: "var(--sidebar-current)",
+        transition: "width 480ms cubic-bezier(0.16, 1, 0.3, 1)",
+        willChange: "width",
+        transform: "translateZ(0)", // GPU compositor layer — prevents jank
+      }}
       onMouseEnter={() => collapsed && setHovering(true)}
       onMouseLeave={() => collapsed && setHovering(false)}
     >

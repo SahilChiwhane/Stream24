@@ -6,9 +6,12 @@ import StreamingBenefitsSection from "../components/StreamingBenefitsSection";
 import SubscriptionPlansSection from "../components/SubscriptionPlansSection";
 import FAQSection from "../components/FAQSection";
 
+import { warmupBackend } from "../../../utils/warmup";
+
 const LandingPage = () => {
   useEffect(() => {
     document.body.style.overflowX = "hidden";
+    warmupBackend();
   }, []);
 
   return (

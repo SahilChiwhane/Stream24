@@ -10,6 +10,7 @@ export default function PaymentPage() {
   const plan = location?.state?.plan || null;
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [razorpayReady, setRazorpayReady] = useState(false);
 
   const parseAmount = (val) => {
@@ -37,6 +38,19 @@ export default function PaymentPage() {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (isConfirming) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-6"></div>
+        <h2 className="text-2xl font-bold mb-2">Verifying Payment</h2>
+        <p className="text-gray-400">
+          We're confirming your subscription with the server. Please don't close
+          this window.
+        </p>
       </div>
     );
   }
@@ -85,23 +99,31 @@ export default function PaymentPage() {
           name: user.name || "User",
         },
         handler: async (res) => {
-          await api.post("/payments/confirm", {
-            planId: plan.id,
-            amount: amountPaise,
-            razorpay_order_id: res.razorpay_order_id,
-            razorpay_payment_id: res.razorpay_payment_id,
-            razorpay_signature: res.razorpay_signature,
-          });
+          setIsConfirming(true);
+          try {
+            await api.post("/payments/confirm", {
+              planId: plan.id,
+              amount: amountPaise,
+              razorpay_order_id: res.razorpay_order_id,
+              razorpay_payment_id: res.razorpay_payment_id,
+              razorpay_signature: res.razorpay_signature,
+            });
 
-          // 🔐 IMPORTANT: prevent redirect race
-          sessionStorage.setItem("payment_success", "true");
-
-          navigate("/subscription/confirmation", { replace: true });
+            sessionStorage.setItem("payment_success", "true");
+            navigate("/subscription/confirmation", { replace: true });
+          } catch (err) {
+            console.error("Payment confirmation failed:", err);
+            alert(
+              "Verification failed. Please contact support if amount was debited.",
+            );
+            setIsConfirming(false);
+          }
         },
       });
 
-      rzp.on("payment.failed", () => {
-        alert("Payment failed");
+      rzp.on("payment.failed", (err) => {
+        setIsProcessing(false);
+        console.error("Payment Failed:", err);
       });
 
       rzp.open();
@@ -109,7 +131,6 @@ export default function PaymentPage() {
       const msg =
         err?.response?.data?.message || "Payment initialization failed";
       alert(msg);
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -123,8 +144,11 @@ export default function PaymentPage() {
         <button
           onClick={handleTestPayment}
           disabled={isProcessing}
-          className="w-full py-3 rounded-xl font-semibold bg-blue-600 hover:bg-blue-500 transition disabled:opacity-50"
+          className="w-full py-3 rounded-xl font-semibold bg-blue-600 hover:bg-blue-500 transition disabled:opacity-50 flex items-center justify-center gap-2"
         >
+          {isProcessing && (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          )}
           {isProcessing ? "Processing..." : "Pay with Razorpay (Test Mode)"}
         </button>
 

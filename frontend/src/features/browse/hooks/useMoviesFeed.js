@@ -6,34 +6,24 @@ const CACHE_KEY = "browse:movies_feed";
 const CACHE_TTL = 600000; // 10 minutes
 
 export function useMoviesFeed() {
-  const [data, setData] = useState(() =>
-    cacheService.getPersistent(CACHE_KEY, CACHE_TTL),
-  );
-  const [loading, setLoading] = useState(
-    !cacheService.getPersistent(CACHE_KEY, CACHE_TTL),
-  );
+  const cachedData = cacheService.getPersistent(CACHE_KEY, CACHE_TTL);
+
+  const [data, setData] = useState(cachedData);
+  // If we already have cached data, start with loading=false so cards render instantly
+  const [loading, setLoading] = useState(!cachedData);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let mounted = true;
 
-    // If we already have cached data, don't show loader, but we could "Background refresh"
-    // For now, if cached, just skip the immediate fetch if we want strict caching,
-    // or re-fetch in background (SWR style). Let's do a smart fetch.
-    const cached = cacheService.getPersistent(CACHE_KEY, CACHE_TTL);
-    if (cached) {
-      if (mounted) {
-        setLoading(false);
-        setData(cached);
-      }
-      // Industrial SWR: Still fetch in background to refresh
+    // If fresh cache exists, skip the network fetch entirely
+    if (cachedData) {
+      return;
     }
 
     async function load() {
       try {
-        setLoading(true);
         const res = await getMoviesFeed();
-
         if (!mounted) return;
 
         // Normalize sections array → object
@@ -69,6 +59,7 @@ export function useMoviesFeed() {
     return () => {
       mounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

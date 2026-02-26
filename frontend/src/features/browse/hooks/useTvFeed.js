@@ -1,19 +1,33 @@
 import { useEffect, useState } from "react";
 import { getTvFeed } from "../services/content.service";
+import { cacheService } from "../../../services/cache";
+
+const CACHE_KEY = "browse:tv_feed";
+const CACHE_TTL = 600000; // 10 minutes
 
 export function useTvFeed() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cachedData = cacheService.getPersistent(CACHE_KEY, CACHE_TTL);
+
+  const [data, setData] = useState(cachedData);
+  // If cached, show instantly — no loading skeleton
+  const [loading, setLoading] = useState(!cachedData);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let active = true;
 
+    // Skip fetch if fresh cache exists
+    if (cachedData) {
+      return;
+    }
+
     async function load() {
       try {
-        setLoading(true);
         const res = await getTvFeed();
-        if (active) setData(res);
+        if (active) {
+          cacheService.setPersistent(CACHE_KEY, res);
+          setData(res);
+        }
       } catch (err) {
         console.error("TV feed error:", err);
         if (active) setError("Failed to load TV shows");
@@ -26,6 +40,7 @@ export function useTvFeed() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Normalize sections array → object for easy access

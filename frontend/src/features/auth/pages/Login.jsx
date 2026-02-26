@@ -11,12 +11,17 @@ import {
 import { auth } from "../../../services/firebase";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useEffect } from "react";
+import { warmupBackend } from "../../../utils/warmup";
 
 export default function Login() {
   const [form, setForm] = useState({
     identifier: "",
     password: "",
   });
+
+  useEffect(() => {
+    warmupBackend();
+  }, []);
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -87,6 +92,27 @@ export default function Login() {
     setSubmitting(true);
     setErrors({});
 
+    const email = form.identifier.trim();
+    if (!email) {
+      setErrors({ identifier: "Email address is required." });
+      setSubmitting(false);
+      return;
+    }
+
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) {
+      setErrors({ identifier: "Enter a valid email address." });
+      setSubmitting(false);
+      return;
+    }
+
+    const password = form.password;
+    if (!password) {
+      setErrors({ password: "Password is required." });
+      setSubmitting(false);
+      return;
+    }
+
     try {
       // 2. Set Persistence based on Remember Me
       await setPersistence(
@@ -94,11 +120,7 @@ export default function Login() {
         rememberMe ? browserLocalPersistence : browserSessionPersistence,
       );
 
-      const cred = await signInWithEmailAndPassword(
-        auth,
-        form.identifier.trim(),
-        form.password,
-      );
+      const cred = await signInWithEmailAndPassword(auth, email, form.password);
 
       // 3. Save/Clear remembered email
       if (rememberMe) {
@@ -239,13 +261,22 @@ export default function Login() {
             )}
 
             <form onSubmit={onSubmit} className="space-y-4">
-              <input
-                name="identifier"
-                value={form.identifier}
-                onChange={onChange}
-                placeholder="Email address"
-                className="w-full px-4 py-3.5 bg-[#16181a] border border-white/10 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-gray-500"
-              />
+              <div className="flex flex-col gap-1">
+                <input
+                  name="identifier"
+                  value={form.identifier}
+                  onChange={onChange}
+                  placeholder="Email address"
+                  className={`w-full px-4 py-3.5 bg-[#16181a] border rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder:text-gray-500 ${
+                    errors.identifier ? "border-red-500" : "border-white/10"
+                  }`}
+                />
+                {errors.identifier && (
+                  <span className="text-red-500 text-xs ml-1">
+                    {errors.identifier}
+                  </span>
+                )}
+              </div>
 
               <div className="relative">
                 <input
@@ -265,6 +296,11 @@ export default function Login() {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
               </div>
+              {errors.password && (
+                <span className="text-red-500 text-xs ml-1">
+                  {errors.password}
+                </span>
+              )}
 
               <div className="flex items-center justify-between text-sm text-gray-400 my-4">
                 <label className="flex items-center gap-2 cursor-pointer">

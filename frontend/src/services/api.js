@@ -32,6 +32,26 @@ const getAuthenticatedUser = () => {
   });
 };
 
+/**
+ * Smart token getter — only force-refreshes when the token is
+ * within 5 minutes of expiry. This avoids a 200-800ms Firebase
+ * round-trip on every single request.
+ */
+const getToken = async (user) => {
+  try {
+    // getIdTokenResult gives us the expiry time without forcing a refresh
+    const result = await user.getIdTokenResult(false);
+    const expiresAt = new Date(result.expirationTime).getTime();
+    const fiveMinutes = 5 * 60 * 1000;
+    const needsRefresh = expiresAt - Date.now() < fiveMinutes;
+    // Only force-refresh if the token is close to/past expiry
+    return await user.getIdToken(needsRefresh);
+  } catch {
+    // Fallback: get token without forcing refresh
+    return await user.getIdToken(false);
+  }
+};
+
 api.interceptors.request.use(async (config) => {
   try {
     let user = auth.currentUser;
@@ -42,7 +62,7 @@ api.interceptors.request.use(async (config) => {
     }
 
     if (user) {
-      const token = await user.getIdToken(true); // 🚀 Force refresh if needed
+      const token = await getToken(user);
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (err) {

@@ -5,7 +5,6 @@ import "./HeroSection.css";
 
 /* ─── Helpers ────────────────────────────────── */
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-const isPhone = (v) => /^\+?[0-9]{7,15}$/.test(v);
 
 /* ─── Component ──────────────────────────────── */
 const HeroSection = () => {
@@ -63,11 +62,11 @@ const HeroSection = () => {
 
     const v = identifier.trim();
     if (!v) {
-      setError("Please enter your email or phone number.");
+      setError("Please enter your email address.");
       return;
     }
-    if (!isEmail(v) && !isPhone(v)) {
-      setError("Enter a valid email or phone number.");
+    if (!isEmail(v)) {
+      setError("Enter a valid email address.");
       return;
     }
 
@@ -203,7 +202,7 @@ const HeroSection = () => {
           >
             <div className="cta-row mt-6 flex flex-col sm:flex-row gap-3 w-full">
               <input
-                type="text"
+                type="email"
                 placeholder="Enter email address"
                 value={identifier}
                 onChange={(e) => {

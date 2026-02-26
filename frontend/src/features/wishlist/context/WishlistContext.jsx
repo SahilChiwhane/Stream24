@@ -43,14 +43,39 @@ export function WishlistProvider({ children }) {
     };
   }, [user, initialized]);
 
-  const add = async (item) => {
-    await addWishlist(item);
-    setItems((prev) => [{ ...item, addedAt: Date.now() }, ...prev]);
+  // Optimistic add: update UI immediately, rollback if backend fails
+  const add = (item) => {
+    const optimisticItem = { ...item, addedAt: Date.now() };
+    setItems((prev) => {
+      // Don't add duplicates
+      if (prev.some((i) => String(i.id) === String(item.id))) return prev;
+      return [optimisticItem, ...prev];
+    });
+
+    // Fire backend request in background — don't await
+    addWishlist(item).catch((err) => {
+      console.error("[Wishlist] Add failed, rolling back:", err);
+      // Rollback: remove the optimistically added item
+      setItems((prev) => prev.filter((i) => String(i.id) !== String(item.id)));
+    });
   };
 
-  const remove = async (id) => {
-    await removeWishlist(id);
-    setItems((prev) => prev.filter((i) => String(i.id) !== String(id)));
+  // Optimistic remove: update UI immediately, rollback if backend fails
+  const remove = (id) => {
+    // Snapshot current items for potential rollback
+    setItems((prev) => {
+      const snapshot = prev;
+      const next = prev.filter((i) => String(i.id) !== String(id));
+
+      // Fire backend request in background — don't await
+      removeWishlist(id).catch((err) => {
+        console.error("[Wishlist] Remove failed, rolling back:", err);
+        // Rollback: restore the removed item
+        setItems(snapshot);
+      });
+
+      return next;
+    });
   };
 
   const exists = (id) => {

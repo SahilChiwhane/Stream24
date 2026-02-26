@@ -40,27 +40,6 @@
 //   };
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useEffect, useState } from "react";
 
 const MOBILE_BREAKPOINT = 640;
@@ -85,18 +64,20 @@ export default function useSidebarLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Sync CSS layout token
+  // Sync CSS layout token — use rAF so it's applied before the next paint
+  // This eliminates the 1-frame "stuck" delay on collapse/expand
   useEffect(() => {
-    if (isMobile) {
-      document.documentElement.style.setProperty("--sidebar-current", "0px");
-    } else {
-      document.documentElement.style.setProperty(
-        "--sidebar-current",
-        collapsed
-          ? "var(--sidebar-collapsed)"
-          : "var(--sidebar-expanded)"
-      );
-    }
+    const raf = requestAnimationFrame(() => {
+      if (isMobile) {
+        document.documentElement.style.setProperty("--sidebar-current", "0px");
+      } else {
+        document.documentElement.style.setProperty(
+          "--sidebar-current",
+          collapsed ? "var(--sidebar-collapsed)" : "var(--sidebar-expanded)",
+        );
+      }
+    });
+    return () => cancelAnimationFrame(raf);
   }, [collapsed, isMobile]);
 
   return {

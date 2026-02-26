@@ -7,15 +7,75 @@ import { fetchWatchHistory } from "../../watch-history/services/watchHistory.ser
 const HeroSkeleton = () => {
   return (
     <section className="relative w-full bg-black overflow-hidden">
-      <div className="relative aspect-[2/3] md:hidden">
-        <div className="absolute inset-0 skeleton" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
+      {/* ── MOBILE ── */}
+      <div className="relative aspect-[2/3] md:hidden overflow-hidden">
+        {/* Shimmer backdrop */}
+        <div className="skeleton absolute inset-0 rounded-none" />
+        {/* Gradient fade so content skeleton is readable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+        {/* Content skeleton anchored to bottom */}
+        <div className="absolute bottom-0 left-0 w-full px-5 pb-10 space-y-3">
+          {/* Title — wide bar */}
+          <div className="hero-skeleton-block h-7 w-3/4 rounded-md" />
+          {/* Title second line — shorter */}
+          <div className="hero-skeleton-block h-7 w-1/2 rounded-md" />
+
+          {/* Meta chips row */}
+          <div className="flex gap-2 pt-1">
+            <div className="hero-skeleton-block h-4 w-10 rounded-full" />
+            <div className="hero-skeleton-block h-4 w-12 rounded-full" />
+            <div className="hero-skeleton-block h-4 w-14 rounded-full" />
+          </div>
+
+          {/* Description lines */}
+          <div className="space-y-1.5 pt-1">
+            <div className="hero-skeleton-block h-3 w-full rounded" />
+            <div className="hero-skeleton-block h-3 w-5/6 rounded" />
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3 pt-2">
+            <div className="hero-skeleton-block h-10 w-28 rounded-lg" />
+            <div className="hero-skeleton-block h-10 w-24 rounded-lg" />
+          </div>
+        </div>
       </div>
 
-      <div className="hidden md:block relative h-[88vh]">
-        <div className="absolute inset-0 skeleton" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+      {/* ── DESKTOP ── */}
+      <div className="hidden md:block relative h-[88vh] overflow-hidden">
+        {/* Shimmer backdrop */}
+        <div className="skeleton absolute inset-0 rounded-none" />
+        {/* Directional gradient overlays — same as real hero */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
+
+        {/* Content skeleton anchored to bottom-left */}
+        <div className="absolute bottom-0 left-0 px-12 pb-14 space-y-4 max-w-2xl">
+          {/* Title — two lines */}
+          <div className="hero-skeleton-block h-12 w-[420px] rounded-lg" />
+          <div className="hero-skeleton-block h-12 w-[280px] rounded-lg" />
+
+          {/* Meta chips */}
+          <div className="flex gap-3 pt-1">
+            <div className="hero-skeleton-block h-5 w-12 rounded-full" />
+            <div className="hero-skeleton-block h-5 w-14 rounded-full" />
+            <div className="hero-skeleton-block h-5 w-16 rounded-full" />
+          </div>
+
+          {/* Description — 3 lines */}
+          <div className="space-y-2 pt-1">
+            <div className="hero-skeleton-block h-4 w-[480px] rounded" />
+            <div className="hero-skeleton-block h-4 w-[420px] rounded" />
+            <div className="hero-skeleton-block h-4 w-[300px] rounded" />
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-4 pt-3">
+            <div className="hero-skeleton-block h-12 w-32 rounded-lg" />
+            <div className="hero-skeleton-block h-12 w-28 rounded-lg" />
+          </div>
+        </div>
       </div>
     </section>
   );

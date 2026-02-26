@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { firestore } from "../../config/firebase.js";
 import { subscriptionCollection } from "../subscription/subscription.model.js";
 import { ACCOUNT_STATUS } from "../../constants/accountStatus.js";
-import { updateUserProfile } from "../user/user.service.js";
+import { updateUserProfile, patchUser } from "../user/user.service.js";
 import logger from "../../utils/logger.js";
 
 const subRef = firestore.collection(subscriptionCollection);
@@ -145,7 +145,7 @@ export const verifyAndActivate = async ({
   // 🚀 Proactive Lifecycle Transition
   // Ensure the user is immediately marked as ready for the platform
   try {
-    await updateUserProfile(uid, {
+    await patchUser(uid, {
       accountStatus: ACCOUNT_STATUS.ACCOUNT_READY,
     });
   } catch (err) {

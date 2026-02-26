@@ -76,8 +76,38 @@ export default function Account() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center font-sans tracking-tight">
-        Loading profile…
+      <div className="min-h-screen bg-black text-white px-4 py-6 font-sans tracking-tight">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Profile identity block skeleton */}
+          <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 md:p-14">
+            <div className="flex flex-col md:flex-row gap-16">
+              {/* Left: avatar + buttons */}
+              <div className="flex flex-col items-center md:min-w-[280px] gap-6">
+                <div className="skeleton w-44 h-44 rounded-3xl" />
+                <div className="skeleton h-6 w-36 rounded-lg" />
+                <div className="skeleton h-11 w-full max-w-[280px] rounded-xl" />
+              </div>
+              {/* Right: form fields */}
+              <div className="flex-1 space-y-8 pt-2">
+                <div className="space-y-2">
+                  <div className="skeleton h-10 w-64 rounded-lg" />
+                  <div className="skeleton h-4 w-80 rounded" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="skeleton h-12 w-full rounded-xl" />
+                  <div className="skeleton h-12 w-full rounded-xl" />
+                </div>
+                <div className="skeleton h-12 w-full rounded-xl" />
+                <div className="skeleton h-12 w-36 rounded-2xl" />
+              </div>
+            </div>
+          </div>
+          {/* Subscription + delete block skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="skeleton h-72 rounded-[2.5rem]" />
+            <div className="skeleton h-72 rounded-[2.5rem]" />
+          </div>
+        </div>
       </div>
     );
 

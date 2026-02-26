@@ -37,7 +37,7 @@ const SubscriptionConfirmation = () => {
         // Auto redirect to movies page
         setTimeout(() => {
           if (alive) navigate("/movies", { replace: true });
-        }, 5000);
+        }, 3000);
       } catch (err) {
         if (retryCount < 3) {
           setTimeout(() => load(retryCount + 1), 1000);
@@ -149,7 +149,7 @@ const SubscriptionConfirmation = () => {
           </button>
 
           <p className="text-center text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-            Redirecting to catalog in 5 seconds...
+            Redirecting to catalog in 3 seconds...
           </p>
         </div>
       </div>

@@ -6,30 +6,23 @@ const CACHE_KEY = "browse:anime_feed";
 const CACHE_TTL = 600000; // 10 minutes
 
 export function useAnimeFeed() {
-  const [data, setData] = useState(() =>
-    cacheService.getPersistent(CACHE_KEY, CACHE_TTL),
-  );
-  const [loading, setLoading] = useState(
-    !cacheService.getPersistent(CACHE_KEY, CACHE_TTL),
-  );
+  const cachedData = cacheService.getPersistent(CACHE_KEY, CACHE_TTL);
+
+  const [data, setData] = useState(cachedData);
+  // If cached, show instantly — no loading spinner
+  const [loading, setLoading] = useState(!cachedData);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let active = true;
 
-    // SWR-style check
-    const cached = cacheService.getPersistent(CACHE_KEY, CACHE_TTL);
-    if (cached) {
-      if (active) {
-        setLoading(false);
-        setData(cached);
-      }
-      // SWR: fetch anyway in bg
+    // Skip fetch entirely if we have fresh cached data
+    if (cachedData) {
+      return;
     }
 
     async function load() {
       try {
-        setLoading(true);
         const res = await getAnimeFeed();
         if (active) {
           cacheService.setPersistent(CACHE_KEY, res);
@@ -47,6 +40,7 @@ export function useAnimeFeed() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Normalize sections array → object for easy access

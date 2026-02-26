@@ -12,6 +12,8 @@ import { auth } from "../../../services/firebase";
 import api from "../../../services/api";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
+import { warmupBackend } from "../../../utils/warmup";
+
 const initialState = {
   firstName: "",
   lastName: "",
@@ -36,8 +38,13 @@ export default function SignUp() {
   const [errors, setErrors] = useState({});
   const [friendlyError, setFriendlyError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [signupStep, setSignupStep] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    warmupBackend();
+  }, []);
 
   const months = [
     "January",
@@ -93,12 +100,12 @@ export default function SignUp() {
     if (!f.day || !f.month || !f.year)
       e.dob = "Please select your complete date of birth.";
     else if (!validateAge18Plus(f.day, f.month, f.year))
-      e.dob = "You must be at least 18 years old.";
+      e.dob = "Age must be at least 18.";
 
     if (!f.password) e.password = "Password is required.";
     else if (!strongPasswordRegex.test(f.password))
       e.password =
-        "Password must be 8+ chars, include 1 uppercase, 1 number, and 1 special symbol.";
+        "Password must contain 8+ chars, 1 uppercase, 1 number, and 1 special symbol.";
 
     if (f.password !== f.confirmPassword)
       e.confirmPassword = "Passwords do not match.";
@@ -150,35 +157,48 @@ export default function SignUp() {
     if (Object.keys(eObj).length) return;
 
     setSubmitting(true);
+    setSignupStep("Creating security credentials...");
+    setFriendlyError(null);
 
     try {
+      // 1. Create User (Must be first)
       const res = await createUserWithEmailAndPassword(
         auth,
         form.email,
         form.password,
       );
 
-      await updateProfile(res.user, {
-        displayName: `${form.firstName} ${form.lastName}`,
-      });
-
+      // 2. Get ID Token immediately
       const token = await res.user.getIdToken(true);
 
-      await api.post(
-        "/auth/signup-complete",
-        {
-          profile: {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            dob: { day: form.day, month: form.month, year: form.year },
-          },
-          planIntent: preselectedPlan,
-          funnel: fromPlan ? "subscribe" : "standard",
-        },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      setSignupStep("Initializing your profile...");
 
-      await sendEmailVerification(res.user);
+      // 3. Parallelize everything else to save time
+      await Promise.all([
+        updateProfile(res.user, {
+          displayName: `${form.firstName} ${form.lastName}`,
+        }),
+        api.post(
+          "/auth/signup-complete",
+          {
+            profile: {
+              firstName: form.firstName,
+              lastName: form.lastName,
+              dob: { day: form.day, month: form.month, year: form.year },
+            },
+            planIntent: preselectedPlan,
+            funnel: fromPlan ? "subscribe" : "standard",
+          },
+          { headers: { Authorization: `Bearer ${token}` } },
+        ),
+        sendEmailVerification(res.user).catch((e) =>
+          console.error("Verification email failed:", e),
+        ),
+      ]);
+
+      setSignupStep("Finishing up...");
+
+      // 4. Secure Sign Out and Navigate
       await signOut(auth);
 
       navigate("/verify-email", {
@@ -188,11 +208,6 @@ export default function SignUp() {
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
         console.error("SIGNUP ERROR:", err);
-        if (err.message === "Network Error") {
-          console.error(
-            "🌐 API Network Error: Check if server is reachable and firewall allows port 5051",
-          );
-        }
       }
       setFriendlyError(
         mapFirebaseError(
@@ -246,135 +261,184 @@ export default function SignUp() {
         <form onSubmit={onSubmit} noValidate className="space-y-3.5">
           {/* Names */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input
-              name="firstName"
-              value={form.firstName}
-              onChange={onChange}
-              placeholder="First name"
-              className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
-                errors.firstName ? "border-red-500" : "border-white/10"
-              }`}
-            />
-            <input
-              name="lastName"
-              value={form.lastName}
-              onChange={onChange}
-              placeholder="Last name"
-              className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
-                errors.lastName ? "border-red-500" : "border-white/10"
-              }`}
-            />
+            <div className="flex flex-col gap-1">
+              <input
+                name="firstName"
+                value={form.firstName}
+                onChange={onChange}
+                placeholder="First name"
+                className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.firstName ? "border-red-500" : "border-white/10"
+                }`}
+              />
+              {errors.firstName && (
+                <span className="text-red-500 text-xs ml-1">
+                  {errors.firstName}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <input
+                name="lastName"
+                value={form.lastName}
+                onChange={onChange}
+                placeholder="Last name"
+                className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.lastName ? "border-red-500" : "border-white/10"
+                }`}
+              />
+              {errors.lastName && (
+                <span className="text-red-500 text-xs ml-1">
+                  {errors.lastName}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Email */}
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={onChange}
-            readOnly={emailLocked}
-            placeholder="Email address"
-            className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
-              errors.email ? "border-red-500" : "border-white/10"
-            } ${emailLocked ? "opacity-70 cursor-not-allowed" : ""}`}
-          />
+          <div className="flex flex-col gap-1">
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={onChange}
+              readOnly={emailLocked}
+              placeholder="Email address"
+              className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                errors.email ? "border-red-500" : "border-white/10"
+              } ${emailLocked ? "opacity-70 cursor-not-allowed" : ""}`}
+            />
+            {errors.email && (
+              <span className="text-red-500 text-xs ml-1">{errors.email}</span>
+            )}
+          </div>
 
           {/* DOB */}
-          <div className="grid grid-cols-3 gap-2 my-4">
-            <select
-              name="day"
-              value={form.day}
-              onChange={onChange}
-              className="px-3 py-2 rounded-lg bg-[#16181a] border border-white/10 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-            >
-              <option value="">Day</option>
-              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+          <div className="my-4">
+            <div className="grid grid-cols-3 gap-2">
+              <select
+                name="day"
+                value={form.day}
+                onChange={onChange}
+                className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.dob ? "border-red-500" : "border-white/10"
+                }`}
+              >
+                <option value="">Day</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
 
-            <select
-              name="month"
-              value={form.month}
-              onChange={onChange}
-              className="px-3 py-2 rounded-lg bg-[#16181a] border border-white/10 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-            >
-              <option value="">Month</option>
-              {months.map((m, i) => (
-                <option key={i} value={i}>
-                  {m}
-                </option>
-              ))}
-            </select>
+              <select
+                name="month"
+                value={form.month}
+                onChange={onChange}
+                className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.dob ? "border-red-500" : "border-white/10"
+                }`}
+              >
+                <option value="">Month</option>
+                {months.map((m, i) => (
+                  <option key={i} value={i}>
+                    {m}
+                  </option>
+                ))}
+              </select>
 
-            <select
-              name="year"
-              value={form.year}
-              onChange={onChange}
-              className="px-3 py-2 rounded-lg bg-[#16181a] border border-white/10 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-            >
-              <option value="">Year</option>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              <select
+                name="year"
+                value={form.year}
+                onChange={onChange}
+                className={`px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.dob ? "border-red-500" : "border-white/10"
+                }`}
+              >
+                <option value="">Year</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.dob && (
+              <span className="text-red-500 text-xs mt-1 ml-1 block">
+                {errors.dob}
+              </span>
+            )}
           </div>
 
           {/* Passwords */}
-          <div className="relative">
-            <input
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={form.password}
-              onChange={onChange}
-              placeholder="Password"
-              className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
-                errors.password ? "border-red-500" : "border-white/10"
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-            >
-              {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-            </button>
+          <div className="flex flex-col gap-1">
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={onChange}
+                placeholder="Password"
+                className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.password ? "border-red-500" : "border-white/10"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+            </div>
+            {errors.password && (
+              <span className="text-red-500 text-xs ml-1">
+                {errors.password}
+              </span>
+            )}
           </div>
 
-          <div className="relative">
-            <input
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              value={form.confirmPassword}
-              onChange={onChange}
-              placeholder="Confirm password"
-              className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
-                errors.confirmPassword ? "border-red-500" : "border-white/10"
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-            >
-              {showConfirmPassword ? (
-                <FiEyeOff size={18} />
-              ) : (
-                <FiEye size={18} />
-              )}
-            </button>
+          <div className="flex flex-col gap-1">
+            <div className="relative">
+              <input
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={form.confirmPassword}
+                onChange={onChange}
+                placeholder="Confirm password"
+                className={`w-full px-3 py-2 rounded-lg bg-[#16181a] border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${
+                  errors.confirmPassword ? "border-red-500" : "border-white/10"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                {showConfirmPassword ? (
+                  <FiEyeOff size={18} />
+                ) : (
+                  <FiEye size={18} />
+                )}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <span className="text-red-500 text-xs ml-1">
+                {errors.confirmPassword}
+              </span>
+            )}
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-500 disabled:opacity-60"
+            className="w-full py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-500 disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {submitting ? "Creating account..." : "Create Account"}
+            {submitting && (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            )}
+            {submitting ? signupStep : "Create Account"}
           </button>
 
           <p className="text-center text-sm text-gray-400">

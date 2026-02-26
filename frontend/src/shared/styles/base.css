@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
 /* ---------------------------
   THEME TOKENS (dark base only)
@@ -66,7 +66,11 @@ html {
   scrollbar-gutter: stable;
   scroll-behavior: smooth;
   min-height: 100%;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 body {
@@ -74,7 +78,11 @@ body {
   padding: 0;
   scrollbar-gutter: stable;
   min-height: 100%;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -82,13 +90,16 @@ body {
 /* On mobile there are no persistent scrollbars — scrollbar-gutter
    just wastes space or causes hairline rendering artifacts */
 @media (max-width: 639px) {
-  html, body {
+  html,
+  body {
     scrollbar-gutter: auto;
   }
 }
 
 /* Prevent any section/header default margin from creating a gap */
-section, header, nav {
+section,
+header,
+nav {
   margin: 0;
   padding: 0;
 }
@@ -561,7 +572,6 @@ body,
     line-height: 1;
   }
 
-
   /* Tooltip polish */
   .group > span.absolute {
     background: rgba(18, 18, 18, 0.92) !important;
@@ -858,6 +868,15 @@ body,
     }
   }
 
+  @keyframes shimmer-bright {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   .skeleton {
     position: relative;
     overflow: hidden;
@@ -885,6 +904,31 @@ body,
       transparent 100%
     );
     animation: shimmer 1.3s ease-in-out infinite;
+  }
+
+  /* Hero overlay content skeleton — brighter shimmer so it's visible
+     against the darker gradient that overlays the backdrop shimmer */
+  .hero-skeleton-block {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+  }
+
+  .hero-skeleton-block::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 100%
+    );
+    animation: shimmer-bright 1.6s ease-in-out infinite;
   }
 
   /* Skeleton sizes */
@@ -1045,7 +1089,6 @@ body,
   /* ===========================
    HERO ANIMATIONS
   =========================== */
-
 
   @keyframes hero-kenburns {
     from {

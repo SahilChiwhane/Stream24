@@ -45,12 +45,13 @@ export const useProfileForm = () => {
       try {
         setLoading(true);
 
-        // Fetch Profile
-        const res = await api.get("/users/me");
-        const profile = res.data?.data?.profile || {};
+        // ⚡ Parallel fetch — profile + subscription at the same time
+        const [res, subRes] = await Promise.all([
+          api.get("/users/me"),
+          api.get("/subscription/me"),
+        ]);
 
-        // Fetch Subscription
-        const subRes = await api.get("/subscription/me");
+        const profile = res.data?.data?.profile || {};
         const subData = subRes.data?.data?.subscription || null;
 
         if (mounted) {

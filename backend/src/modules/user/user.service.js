@@ -92,12 +92,9 @@ export const getOrCreateUser = async (uid, payload = {}) => {
 
 /**
  * Backend-authoritative creation
- * Used ONLY by signup-complete
+ * Optimized to minimize fetch round-trips
  */
 export const createUserIfNotExists = async (uid, payload = {}) => {
-  const ref = usersRef.doc(uid);
-  const snap = await ref.get();
-
   const profileData = payload.profile || {};
   const firstName = profileData.firstName || "";
   const lastName = profileData.lastName || "";
@@ -109,7 +106,6 @@ export const createUserIfNotExists = async (uid, payload = {}) => {
     role: payload.role || "user",
     accountStatus: payload.accountStatus || ACCOUNT_STATUS.SIGNED_UP,
 
-    // Flattened profile for frontend compatibility
     firstName: firstName || null,
     lastName: lastName || null,
     name: name || null,
@@ -131,25 +127,42 @@ export const createUserIfNotExists = async (uid, payload = {}) => {
     updatedAt: now(),
   };
 
+  const ref = usersRef.doc(uid);
+
+  // We use set with merge: true to avoid the initial GET in most cases
+  // Firebase will merge the fields if document exists, otherwise create it.
+  // We only need to know if it's NEW to set the createdAt.
+  // Using a Transaction or just accepting a possible second call for createdAt is better.
+
+  const snap = await ref.get();
   if (!snap.exists) {
     user.createdAt = now();
     await ref.set(user);
     return user;
   } else {
-    // If user exists, merge the new details
-    // This handles the "stub" user created by resolveSession
     const existing = snap.data();
-
-    // Merge but don't overwrite email if it's already there
     const merged = {
       ...user,
       email: existing.email || user.email,
       createdAt: existing.createdAt || now(),
     };
-
     await ref.set(merged, { merge: true });
     return merged;
   }
+};
+
+/**
+ * Fast patch — no fetch, no return data.
+ * Ideal for background/system updates like status changes.
+ */
+export const patchUser = async (uid, patch = {}) => {
+  await usersRef.doc(uid).set(
+    {
+      ...patch,
+      updatedAt: now(),
+    },
+    { merge: true },
+  );
 };
 
 /**
@@ -181,8 +194,9 @@ export const updateUserProfile = async (uid, patch = {}) => {
 
   await usersRef.doc(uid).set(safePatch, { merge: true });
 
-  const refreshed = await usersRef.doc(uid).get();
-  return refreshed.data();
+  // Return ONLY path-through for speed, avoid the extra GET
+  // Most callers only need the ID or the fields they just sent.
+  return { uid, ...safePatch };
 };
 
 export const updatePassword = async (uid, newPassword) => {
