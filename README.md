@@ -1,6 +1,6 @@
 # 🎬 Stream24
 
-**Stream24** is a full-stack **OTT streaming platform** that allows users to discover and watch movies, anime, and TV series with subscription-based access.
+**Stream24** is a full-stack **OTT streaming platform** that allows users to watch movies, anime, and TV series with subscription-based access.
 
 The project simulates the core experience of modern streaming platforms such as Netflix or Crunchyroll, including authentication, subscriptions, personalized browsing, and watch history tracking.
 
